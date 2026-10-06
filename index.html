@@ -314,12 +314,12 @@ p{margin:0;font-size:17px;line-height:1.45;max-width:36ch}
 <div id="lock">
   <div class="t">Enter Passcode</div>
   <div class="pd" id="pd"><i></i><i></i><i></i><i></i></div>
-  <div class="hint">hint: the month and day of “Hi this is grace”</div>
+  <div class="hint">hint: our anniversary</div>
   <div class="kp" id="kp"></div>
 </div>
 <script>
 (function(){
-  var CODE="0909", lock=document.getElementById('lock'), pd=document.getElementById('pd'), kp=document.getElementById('kp'), v="";
+  var CODE="1014", lock=document.getElementById('lock'), pd=document.getElementById('pd'), kp=document.getElementById('kp'), v="";
   try{if(localStorage.getItem('y1-open')==='1'){lock.hidden=true;return}}catch(e){}
   ["1","2","3","4","5","6","7","8","9","","0","⌫"].forEach(function(k){var b=document.createElement('button');b.type='button';b.textContent=k;if(!k){b.style.visibility='hidden'}if(k==='⌫')b.className='x';
     b.onclick=function(){if(k==='⌫'){v=v.slice(0,-1)}else if(v.length<4){v+=k}draw();if(v.length===4){if(v===CODE){try{localStorage.setItem('y1-open','1')}catch(e){}setTimeout(function(){lock.hidden=true},200)}else{pd.classList.add('shake');setTimeout(function(){pd.classList.remove('shake');v="";draw()},450)}}};kp.appendChild(b)});
@@ -423,7 +423,7 @@ p{margin:0;font-size:17px;line-height:1.45;max-width:36ch}
     </div></div>
   </div>
   <div class="sticker pop" style="--rot:3deg;--c:#fff7ec"><b>82 vs 81</b><span>“miss you”s, him vs you. Dead heat.</span></div>
-  <figure class="pol wide like pop center" tabindex="0" style="--rot:-3deg"><img src="p/112.jpg" alt="Grace cuddling a dog"><figcaption>both cute</figcaption></figure>
+  <figure class="pol wide like pop center" tabindex="0" style="--rot:-3deg"><img src="112.jpg" alt="Grace cuddling a dog"><figcaption>both cute</figcaption></figure>
   <p class="tip">double-tap any photo to ♥</p>
 </section>
 
@@ -479,7 +479,7 @@ p{margin:0;font-size:17px;line-height:1.45;max-width:36ch}
 <section class="sec" data-sky="winter" data-line="ski" data-chip="🎿 Mar 2026" data-say="a ski lift">
   <div class="rail r-ski"></div>
   <span class="place">🎿 The family ski trip · March 2026</span>
-  <figure class="pol wide like pop" tabindex="0" style="--rot:-2deg"><img src="p/547.jpg" alt="Grace and Marwan in ski gear"><figcaption>first family trip</figcaption></figure>
+  <figure class="pol wide like pop" tabindex="0" style="--rot:-2deg"><img src="547.jpg" alt="Grace and Marwan in ski gear"><figcaption>first family trip</figcaption></figure>
   <p>You brought him on the family ski trip. He survived. Mostly.</p>
 </section>
 
@@ -489,22 +489,22 @@ p{margin:0;font-size:17px;line-height:1.45;max-width:36ch}
   <div class="stop">
     <p class="k">Stop 1 · Feb 2026</p>
     <h3>The art exhibit</h3>
-    <figure class="pol like pop" tabindex="0" style="--rot:-4deg"><img src="p/148.jpg" alt="Marwan sitting inside an art installation"><figcaption>main character energy</figcaption></figure>
-    <figure class="pol wide like pop" tabindex="0" style="--rot:3deg;justify-self:end;width:min(70%,230px)"><img src="p/147.jpg" alt="A subway entrance at night lit purple"><figcaption>the way there</figcaption></figure>
+    <figure class="pol like pop" tabindex="0" style="--rot:-4deg"><img src="148.jpg" alt="Marwan sitting inside an art installation"><figcaption>main character energy</figcaption></figure>
+    <figure class="pol wide like pop" tabindex="0" style="--rot:3deg;justify-self:end;width:min(70%,230px)"><img src="147.jpg" alt="A subway entrance at night lit purple"><figcaption>the way there</figcaption></figure>
   </div>
   <div class="stop">
     <p class="k">Stop 2 · Madison Square Garden</p>
     <h3>Knicks game</h3>
-    <figure class="pol wide like pop" tabindex="0" style="--rot:2deg"><img src="p/546.jpg" alt="Grace and Marwan smiling at the Knicks game"><figcaption>us at the Garden</figcaption></figure>
-    <figure class="pol like pop" tabindex="0" style="--rot:-5deg;justify-self:end;width:min(56%,190px)"><img src="p/232.jpg" alt="View of the court at Madison Square Garden"><figcaption>the view</figcaption></figure>
+    <figure class="pol wide like pop" tabindex="0" style="--rot:2deg"><img src="546.jpg" alt="Grace and Marwan smiling at the Knicks game"><figcaption>us at the Garden</figcaption></figure>
+    <figure class="pol like pop" tabindex="0" style="--rot:-5deg;justify-self:end;width:min(56%,190px)"><img src="232.jpg" alt="View of the court at Madison Square Garden"><figcaption>the view</figcaption></figure>
   </div>
   <div class="stop">
     <p class="k">Stop 3 · Coney Island · Apr 28</p>
     <h3>The aquarium date</h3>
     <div class="stack" data-stack>
-      <figure class="pol"><img src="p/302.jpg" alt="Grace and Marwan smiling at Coney Island"><figcaption>the aquarium date</figcaption></figure>
-      <figure class="pol"><img src="p/282.jpg" alt="Marwan in front of the jellyfish tank"><figcaption>jellyfish guy</figcaption></figure>
-      <figure class="pol"><img src="p/251.jpg" alt="Grace at dinner"><figcaption>dinner after</figcaption></figure>
+      <figure class="pol"><img src="302.jpg" alt="Grace and Marwan smiling at Coney Island"><figcaption>the aquarium date</figcaption></figure>
+      <figure class="pol"><img src="282.jpg" alt="Marwan in front of the jellyfish tank"><figcaption>jellyfish guy</figcaption></figure>
+      <figure class="pol"><img src="251.jpg" alt="Grace at dinner"><figcaption>dinner after</figcaption></figure>
     </div>
     <p class="tip">tap to shuffle</p>
   </div>
@@ -532,9 +532,9 @@ p{margin:0;font-size:17px;line-height:1.45;max-width:36ch}
   <span class="place">🌸 Formal night · Sat, Apr 11, 2026</span>
   <div class="rope" aria-hidden="true"><i></i><span></span><i></i><span></span><i></i></div>
   <div class="stack" data-stack>
-    <figure class="pol"><img src="p/225.jpg" alt="Grace in a pink dress and Marwan in a suit"><figcaption>the pink dress</figcaption></figure>
-    <figure class="pol"><img src="p/228.jpg" alt="Marwan kissing Grace on the cheek"><figcaption>😘</figcaption></figure>
-    <figure class="pol"><img src="p/222.jpg" alt="Grace and Marwan under neon lights"><figcaption>later that night</figcaption></figure>
+    <figure class="pol"><img src="225.jpg" alt="Grace in a pink dress and Marwan in a suit"><figcaption>the pink dress</figcaption></figure>
+    <figure class="pol"><img src="228.jpg" alt="Marwan kissing Grace on the cheek"><figcaption>😘</figcaption></figure>
+    <figure class="pol"><img src="222.jpg" alt="Grace and Marwan under neon lights"><figcaption>later that night</figcaption></figure>
   </div>
   <p class="tip">tap to shuffle</p>
   <h2 class="h">Best-dressed couple. <span class="o">No contest.</span></h2>
@@ -594,7 +594,7 @@ p{margin:0;font-size:17px;line-height:1.45;max-width:36ch}
 <section class="sec" data-sky="golden" data-line="home" data-chip="🍂 Year one" data-say="home">
   <div class="rail r-ribbon"></div>
   <span class="place">🍂 Back to fall · full circle</span>
-  <figure class="pol sq like pop center" tabindex="0" style="--rot:-2deg;width:min(100%,300px)"><img src="p/549.jpg" alt="Happy GF Day heart collage of Grace and Marwan"><figcaption>happy gf day</figcaption></figure>
+  <figure class="pol sq like pop center" tabindex="0" style="--rot:-2deg;width:min(100%,300px)"><img src="549.jpg" alt="Happy GF Day heart collage of Grace and Marwan"><figcaption>happy gf day</figcaption></figure>
   <p>Every day is GF Day. This one just had a graphic.</p>
   <p class="k">One year, added up</p>
   <p class="num" data-count="24266">24,266</p>
