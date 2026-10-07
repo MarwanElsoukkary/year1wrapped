@@ -29,6 +29,7 @@
   --railx:22px;
   color-scheme:light;
 }
+[hidden]{display:none!important}
 html{scroll-behavior:smooth}
 html,body{overflow-x:hidden;overflow-x:clip;max-width:100%;overscroll-behavior-x:none}
 body{touch-action:pan-y}
@@ -212,7 +213,10 @@ p{margin:0;font-size:17px;line-height:1.45;max-width:36ch}
 .opt:active{transform:scale(.96)}
 .opt.right{background:var(--fg);color:var(--inv)}
 .opt.wrong{opacity:.4;text-decoration:line-through}
-.reveal{display:grid;gap:12px}
+.reveal{display:grid;gap:12px;animation:rv .5s cubic-bezier(.2,1.3,.4,1)}
+@keyframes rv{from{transform:translateY(-8px) scale(.96);opacity:0}to{transform:none;opacity:1}}
+.quiz{display:flex;flex-direction:column;gap:16px}
+.opts{grid-template-columns:1fr 1fr}
 .duo{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .duo div{display:grid;gap:2px;min-width:0}
 .duo .n{font-family:var(--display);font-size:clamp(34px,10.5vw,56px);line-height:1;font-variant-numeric:tabular-nums;white-space:nowrap}
@@ -292,7 +296,31 @@ p{margin:0;font-size:17px;line-height:1.45;max-width:36ch}
 @keyframes float{to{transform:translate(var(--dx),-280px) rotate(var(--r));opacity:0}}
 .foot{text-align:center;font:500 11px var(--mono);letter-spacing:.08em;text-transform:uppercase;opacity:.8}
 
+
+/* soundtrack dock */
+.dock{position:fixed;z-index:35;left:0;right:0;bottom:0;display:flex;justify-content:center;pointer-events:none;padding:0 12px calc(12px + env(safe-area-inset-bottom,0px))}
+.dock .in{pointer-events:auto;width:100%;max-width:456px;display:grid;gap:8px;justify-items:end}
+.dock .card{width:100%;background:rgba(18,16,22,.92);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-radius:16px;padding:10px;display:grid;gap:8px;color:#f4f0f6;box-shadow:0 10px 30px rgba(0,0,0,.4);transform-origin:bottom right;transition:transform .35s cubic-bezier(.2,1.3,.4,1),opacity .25s}
+.dock .card.closed{transform:scale(.6) translateY(30px);opacity:0;pointer-events:none;position:absolute;bottom:56px}
+.bgrow{display:flex;align-items:center;gap:10px;padding:2px 4px 6px;border-bottom:1px solid rgba(255,255,255,.12)}
+.bgrow b{display:block;font:800 15px/1.2 var(--body)}
+.bgrow small{font:500 11px var(--mono);opacity:.7}
+.bgbtn{width:38px;height:38px;border-radius:50%;border:0;background:#ff4fa3;color:#fff;font:800 13px var(--body);cursor:pointer;flex:none}
+.dock .why{font:700 19px/1.15 var(--hand);color:#ffd23f;min-height:22px;padding:0 4px}
+.dock .why small{display:block;font:500 10px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:#bbb}
+.dock .frame{height:80px;border-radius:12px;overflow:hidden;background:#282330}
+.dock .frame iframe{border:0;width:100%;height:80px;display:block}
+.dock .fallback{display:flex;align-items:center;justify-content:space-between;gap:10px;height:80px;padding:0 14px;color:#f4f0f6;text-decoration:none;font:700 15px var(--body)}
+.pill{display:inline-flex;align-items:center;gap:10px;border:0;border-radius:999px;padding:8px 14px 8px 8px;background:#121016;color:#fff;font:700 14px var(--body);cursor:pointer;box-shadow:0 6px 18px rgba(0,0,0,.35);max-width:100%}
+.pill .vinyl{width:30px;height:30px;border-radius:50%;flex:none;background:radial-gradient(circle,#ff4fa3 0 5px,#111 5.5px 7px,#222 7.5px 9px,#111 9.5px 11px,#2a2a2a 11.5px 13px,#111 13.5px);animation:spin 2.4s linear infinite;animation-play-state:paused}
+.pill.on .vinyl{animation-play-state:running}
+@keyframes spin{to{transform:rotate(360deg)}}
+.pill span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.pill.nudge{animation:nud .6s cubic-bezier(.2,1.6,.4,1)}
+@keyframes nud{40%{transform:scale(1.12)}}
+.zine{padding-bottom:70px}
 @media (prefers-reduced-motion:reduce){
+  .pill .vinyl{animation:none}
   html{scroll-behavior:auto}
   .pop,.pop.pre{transition:none}
   .typing i,.popin,.dbl,.scrolldown,.travel,.travel .d,.rail,.rail::after{animation:none!important}
@@ -327,7 +355,7 @@ p{margin:0;font-size:17px;line-height:1.45;max-width:36ch}
   var CODE="1014", lock=document.getElementById('lock'), pd=document.getElementById('pd'), kp=document.getElementById('kp'), v="";
   
   ["1","2","3","4","5","6","7","8","9","","0","⌫"].forEach(function(k){var b=document.createElement('button');b.type='button';b.textContent=k;if(!k){b.style.visibility='hidden'}if(k==='⌫')b.className='x';
-    b.onclick=function(){if(k==='⌫'){v=v.slice(0,-1)}else if(v.length<4){v+=k}draw();if(v.length===4){if(v===CODE){setTimeout(function(){lock.hidden=true},200)}else{pd.classList.add('shake');setTimeout(function(){pd.classList.remove('shake');v="";draw()},450)}}};kp.appendChild(b)});
+    b.onclick=function(){if(k==='⌫'){v=v.slice(0,-1)}else if(v.length<4){v+=k}draw();if(v.length===4){if(v===CODE){if(window.startBg)window.startBg();setTimeout(function(){lock.hidden=true},200)}else{pd.classList.add('shake');setTimeout(function(){pd.classList.remove('shake');v="";draw()},450)}}};kp.appendChild(b)});
   function draw(){[].forEach.call(pd.children,function(d,i){d.className=i<v.length?'f':''})}
   addEventListener('pageshow',function(e){if(e.persisted){v='';draw();lock.hidden=false}});
   document.addEventListener('visibilitychange',function(){if(document.visibilityState==='hidden'){v='';draw();lock.hidden=false}});
@@ -347,6 +375,17 @@ p{margin:0;font-size:17px;line-height:1.45;max-width:36ch}
   <span class="say" id="say">here we go</span>
 </div>
 
+<audio id="bg" src="song.mp3" loop preload="auto" playsinline></audio>
+<div class="dock" id="dock">
+  <div class="in">
+    <div class="card closed" id="dockCard">
+      <div class="bgrow"><button class="bgbtn" id="bgBtn" type="button" aria-label="Play or pause the background song">❚❚</button><span><b>While We’re Young</b><small>Jhené Aiko · our song, playing throughout</small></span></div>
+      <div class="why" id="dockWhy"></div>
+      <div class="frame" id="dockFrame"><div id="spEmbed"></div></div>
+    </div>
+    <button class="pill" id="pill" type="button" aria-expanded="false" aria-controls="dockCard"><span class="vinyl" aria-hidden="true"></span><span id="pillTxt">♫ tap for music</span></button>
+  </div>
+</div>
 <main class="zine">
 
 <section class="sec hero" data-sky="dusk" data-line="start" data-chip="☀️ Sep 2025" data-say="here we go">
@@ -388,7 +427,12 @@ p{margin:0;font-size:17px;line-height:1.45;max-width:36ch}
     <span class="cap">Total time since set one</span>
     <div class="seg"><div><b id="cD">0</b><span>days</span></div><div><b id="cH">00</b><span>hrs</span></div><div><b id="cM">00</b><span>min</span></div><div><b id="cS">00</b><span>sec</span></div></div>
   </div>
-  <div class="sticker pop" style="--rot:-3deg;--side:flex-start;--c:#fff;--t:var(--ink)"><b>30 sec vs 1 min</b><span>Typical reply time, him vs you. Nobody’s playing hard to get.</span></div>
+  <div class="quiz">
+    <p class="k">Pop quiz</p>
+    <h2 class="h">Who replies <span class="o">faster?</span></h2>
+    <div class="opts guess" data-answer="m"><button class="opt" data-v="g">Grace</button><button class="opt" data-v="m">Marwan</button></div>
+    <div class="reveal" hidden><div class="duo"><div><span class="n w">30 sec</span><small>Marwan</small></div><div><span class="n">1 min</span><small>Grace</small></div></div><p>Typical reply time. Nobody’s playing hard to get.</p></div>
+  </div>
 </section>
 
 <section class="sec" data-sky="dusk" data-line="wave" data-chip="☀️ Sep 16, 2025" data-say="a sound wave">
@@ -429,7 +473,12 @@ p{margin:0;font-size:17px;line-height:1.45;max-width:36ch}
       <div class="bk"><div class="b me">i deadass told them i can’t do this</div><div class="b me">“this is a important haircut i have date night coming up”</div><div class="b her">Lmaooo</div><div class="b her">Fr nothing but the best for dg date night</div></div>
     </div></div>
   </div>
-  <div class="sticker pop" style="--rot:3deg;--c:#fff7ec"><b>82 vs 81</b><span>“miss you”s, him vs you. Dead heat.</span></div>
+  <div class="quiz">
+    <p class="k">Pop quiz</p>
+    <h2 class="h">Who says “miss you” <span class="o">more?</span></h2>
+    <div class="opts guess" data-answer="m"><button class="opt" data-v="g">Grace</button><button class="opt" data-v="m">Marwan</button></div>
+    <div class="reveal" hidden><div class="duo"><div><span class="n w">82</span><small>Marwan</small></div><div><span class="n">81</span><small>Grace</small></div></div><p>He wins by one. ONE. Basically a tie.</p></div>
+  </div>
   <figure class="pol wide like pop center" tabindex="0" style="--rot:-3deg"><img src="112.jpg" alt="Grace cuddling a dog"><figcaption>both cute</figcaption></figure>
   <p class="tip">double-tap any photo to ♥</p>
 </section>
@@ -453,6 +502,12 @@ p{margin:0;font-size:17px;line-height:1.45;max-width:36ch}
     <canvas aria-label="Scratch to reveal the messages"></canvas>
   </div>
   <p>You said it first, in person. He just got it in writing first.</p>
+  <div class="quiz">
+    <p class="k">Pop quiz</p>
+    <h2 class="h">Who says <span class="o">goodnight</span> more?</h2>
+    <div class="opts guess" data-answer="g"><button class="opt" data-v="g">Grace</button><button class="opt" data-v="m">Marwan</button></div>
+    <div class="reveal" hidden><div class="duo"><div><span class="n w">144</span><small>Grace</small></div><div><span class="n">122</span><small>Marwan</small></div></div><p>You win the night shift.</p></div>
+  </div>
   <div class="sticker pop" style="--rot:-3deg;--side:flex-start;--c:#7ad3ff"><b>441</b><span>texts sent between midnight and 4 AM. Go to sleep.</span></div>
 
   <p class="k">Pop quiz</p>
@@ -522,8 +577,6 @@ p{margin:0;font-size:17px;line-height:1.45;max-width:36ch}
       <div class="ad a2"><span class="tag">Language learning</span><b>Say “pov” like a native</b><p>Marwan: 513 times. Grace: 5. Lessons available.</p><p class="fine">Tuition: one (1) good morning text.</p></div>
       <div class="ad a3"><span class="tag">Car service</span><b>“here”</b><p>140 pickups this year. Driver texts “here,” you text “Coming.”</p><p class="fine">No surge pricing. Tips accepted in kisses.</p></div>
       <div class="ad a5"><span class="tag">The People v. Spelling</span><b>tmr or tmrw?</b><p>Grace: “tmr” 157 times. Marwan: “tmrw” 211 times. The case remains open.</p><p class="fine">Jury still out. Possibly forever.</p></div>
-      <div class="ad a4"><span class="tag">Morning show</span><b>Good morning ☀️</b><p>He sent 307 and texted first on 247 mornings. You sent 230.</p><p class="fine">Brought to you by being up early.</p></div>
-      <div class="ad a6"><span class="tag">Night shift</span><b>Goodnight 🌙</b><p>You sent 144. He sent 122. You win the night shift.</p><p class="fine">Morning person, meet night owl.</p></div>
     </div>
     <div class="dots" id="adDots"></div>
   </div>
@@ -558,22 +611,41 @@ p{margin:0;font-size:17px;line-height:1.45;max-width:36ch}
     <li class="pop" style="--pr:3deg"><span class="d">Jun 8</span><div class="w"><div class="b me">i got the job!!!!!</div></div></li>
     <li class="pop" style="--pr:-3deg"><span class="d">Jun 15</span><div class="w">His first day.<div class="b her">How r u feeling abt ur first day</div></div></li>
   </ul>
-  <div class="sticker pop" style="--rot:3deg;--c:var(--sun)"><b>11 AM</b><span>Our most-texted hour: 1,956 texts. Very productive workdays.</span></div>
+  <div class="quiz">
+    <p class="k">Pop quiz</p>
+    <h2 class="h">Who texts first <span class="o">in the morning?</span></h2>
+    <div class="opts guess" data-answer="m"><button class="opt" data-v="g">Grace</button><button class="opt" data-v="m">Marwan</button></div>
+    <div class="reveal" hidden><div class="duo"><div><span class="n w">247</span><small>Marwan</small></div><div><span class="n">126</span><small>Grace</small></div></div><p>mornings he texted first. 307 good mornings from him, 230 from you.</p></div>
+  </div>
+  <div class="quiz">
+    <p class="k">Pop quiz, part 2</p>
+    <h2 class="h">What time do we text <span class="o">the most?</span></h2>
+    <div class="opts guess" data-answer="11"><button class="opt" data-v="9">9 AM</button><button class="opt" data-v="11">11 AM</button><button class="opt" data-v="16">4 PM</button><button class="opt" data-v="22">10 PM</button></div>
+    <div class="reveal" hidden><div class="duo"><div><span class="n w">11 AM</span><small>1,956 texts</small></div><div><span class="n">4 PM</span><small>1,934 texts</small></div></div><p>Peak hours: the middle of the workday. Very productive, both of us.</p></div>
+  </div>
 </section>
 
 <section class="sec" data-sky="summer" data-line="graph" data-chip="📈 The whole year" data-say="a chart (nerd)">
   <div class="rail r-graph"><svg id="graphRail" preserveAspectRatio="none" viewBox="0 0 34 100"></svg></div>
   <span class="place">📈 The numbers</span>
-  <div class="panel">
-    <p class="k">Texts per month · tap a month</p>
-    <div class="chart" id="chart"></div>
-    <div class="note" id="note"></div>
+<div class="quiz">
+    <p class="k">Pop quiz</p>
+    <h2 class="h">What was our <span class="o">busiest month?</span></h2>
+    <div class="opts guess" data-answer="jun"><button class="opt" data-v="dec">Dec ’25</button><button class="opt" data-v="jan">Jan ’26</button><button class="opt" data-v="may">May ’26</button><button class="opt" data-v="jun">Jun ’26</button></div>
+    <div class="reveal" hidden><div class="panel"><p class="k">Texts per month · tap a month</p><div class="chart" id="chart"></div><div class="note" id="note"></div></div></div>
   </div>
-  <div class="duo">
-    <div class="pop" style="--pr:-6deg"><span class="n w">12,638</span><small>from him</small></div>
-    <div class="pop" style="--pr:6deg"><span class="n">11,628</span><small>from you</small></div>
+  <div class="quiz">
+    <p class="k">Pop quiz</p>
+    <h2 class="h">Who’s sent more texts <span class="o">overall?</span></h2>
+    <div class="opts guess" data-answer="m"><button class="opt" data-v="g">Grace</button><button class="opt" data-v="m">Marwan</button></div>
+    <div class="reveal" hidden><div class="duo"><div><span class="n w">12,638</span><small>Marwan</small></div><div><span class="n">11,628</span><small>Grace</small></div></div><p>He wins by 1,010. Mostly “good morning beautiful.”</p></div>
   </div>
-  <p>He wins by 1,010. Mostly “good morning beautiful.”</p>
+  <div class="quiz">
+    <p class="k">Pop quiz</p>
+    <h2 class="h">Who laughs <span class="o">more?</span></h2>
+    <div class="opts guess" data-answer="m"><button class="opt" data-v="g">Grace</button><button class="opt" data-v="m">Marwan</button></div>
+    <div class="reveal" hidden><div class="duo"><div><span class="n w">845</span><small>Marwan</small></div><div><span class="n">282</span><small>Grace</small></div></div><p>lols, lmaos, hahas and 😭s. You’re funnier than you think. Or he laughs at everything.</p></div>
+  </div>
   <p class="k">Your top emojis · tap them</p>
   <div class="emo">
     <button type="button"><span class="e">😭</span><small>#1</small></button>
@@ -588,6 +660,12 @@ p{margin:0;font-size:17px;line-height:1.45;max-width:36ch}
 <section class="sec" data-sky="summer" data-line="eq" data-chip="🎶 On repeat" data-say="the aux cord">
   <div class="rail r-eq"></div>
   <span class="place">🎶 Every song we sent each other</span>
+<div class="quiz">
+    <p class="k">Pop quiz</p>
+    <h2 class="h">Who sent <span class="o">more songs?</span></h2>
+    <div class="opts guess" data-answer="m"><button class="opt" data-v="g">Grace</button><button class="opt" data-v="m">Marwan</button></div>
+    <div class="reveal" hidden><div class="duo"><div><span class="n w">16</span><small>Marwan</small></div><div><span class="n">14</span><small>Grace</small></div></div><p>Close race. Scroll the whole list below.</p></div>
+  </div>
   <div class="player pop">
     <header><div class="cover">G♥M</div><div><b>Year One</b><small>30 songs · Grace &amp; Marwan</small></div></header>
     <div class="filters" role="group" aria-label="Filter songs">
@@ -718,7 +796,7 @@ p{margin:0;font-size:17px;line-height:1.45;max-width:36ch}
   document.getElementById('love').addEventListener('click',e=>{if(reduce)return;const b=e.currentTarget.getBoundingClientRect();burst(b.left+b.width/2,b.top,16)});
   document.querySelectorAll('.pol.like').forEach(f=>{let last=0;f.addEventListener('click',()=>{const now=Date.now();if(now-last<320&&!reduce){const h=document.createElement('span');h.className='dbl';h.textContent='❤️';f.appendChild(h);setTimeout(()=>h.remove(),950)}last=now})});
   document.querySelectorAll('.flip').forEach(f=>{f.addEventListener('click',()=>f.classList.toggle('on'));f.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();f.classList.toggle('on')}})});
-  document.querySelectorAll('.guess').forEach(g=>g.querySelectorAll('.opt').forEach(b=>b.addEventListener('click',()=>{const right=b.dataset.v===g.dataset.answer;g.querySelectorAll('.opt').forEach(o=>{o.classList.toggle('right',o.dataset.v===g.dataset.answer);o.classList.toggle('wrong',o.dataset.v!==g.dataset.answer);o.disabled=true});g.nextElementSibling.hidden=false;if(right&&!reduce){const r=b.getBoundingClientRect();burst(r.left+r.width/2,r.top,8)}})));
+  document.querySelectorAll('.guess').forEach(g=>g.querySelectorAll('.opt').forEach(b=>b.addEventListener('click',()=>{const right=b.dataset.v===g.dataset.answer;g.querySelectorAll('.opt').forEach(o=>{o.classList.toggle('right',o.dataset.v===g.dataset.answer);o.classList.toggle('wrong',o.dataset.v!==g.dataset.answer);o.disabled=true});g.nextElementSibling.hidden=false;if(g.nextElementSibling.querySelector('#chart')){growChart();pick(9)}if(right&&!reduce){const r=b.getBoundingClientRect();burst(r.left+r.width/2,r.top,8)}})));
   document.querySelectorAll('.emo button').forEach(b=>b.addEventListener('click',()=>{b.classList.add('boing');setTimeout(()=>b.classList.remove('boing'),350)}));
   document.querySelectorAll('[data-stack]').forEach(s=>{const rots=[-4,5,-8,3,7,-2];const lay=()=>[...s.children].forEach((f,i)=>{f.style.zIndex=10-i;f.style.transform=`translate(-50%,-50%) translate(${(i%2?1:-1)*i*7}px,${i*5}px) rotate(${rots[i%rots.length]}deg)`});lay();
     s.addEventListener('click',()=>{const t=s.firstElementChild;if(!reduce)t.style.transform+=' translateX(130%) rotate(20deg)';setTimeout(()=>{s.appendChild(t);lay()},reduce?0:260)})});
@@ -743,13 +821,94 @@ p{margin:0;font-size:17px;line-height:1.45;max-width:36ch}
   months.forEach((m,i)=>{const b=document.createElement('button');b.className='bar';b.type='button';b.setAttribute('aria-label',m[0]+': '+counts[i]+' texts');const h=Math.max(3,counts[i]/3298*125);b.innerHTML=`<i style="height:${h}px" data-h="${h}"></i><span>${m[0].slice(0,1)}</span>`;b.addEventListener('click',()=>pick(i));chart.appendChild(b)});
   function growChart(){if(reduce)return;const is=[...chart.querySelectorAll('i')];is.forEach(i=>i.style.height='3px');requestAnimationFrame(()=>requestAnimationFrame(()=>is.forEach((i,k)=>setTimeout(()=>i.style.height=i.dataset.h+'px',k*45))))}
   function pick(i){[...chart.children].forEach((b,k)=>b.classList.toggle('on',k===i));note.innerHTML=`<span class="k">${months[i][0].replace("'","’")}</span><b>${counts[i].toLocaleString()} texts</b><p>${months[i][1]}</p>`}
-  pick(9);
 
   const start=new Date('2025-09-09T20:03:22-04:00'),pad=n=>String(n).padStart(2,'0');
   const cD=document.getElementById('cD'),cH=document.getElementById('cH'),cM=document.getElementById('cM'),cS=document.getElementById('cS');
   function tm(){let s=Math.floor((Date.now()-start)/1000);cD.textContent=Math.floor(s/86400);s%=86400;cH.textContent=pad(Math.floor(s/3600));s%=3600;cM.textContent=pad(Math.floor(s/60));cS.textContent=pad(s%60)}
   tm();setInterval(tm,1000);
   onScroll();ready=true;
+})();
+</script>
+<script>
+(function(){
+  // background song plays the whole way; each part of the story also has one of our songs she can tap to hear
+  const SONGS={
+    start:["5KADKKJqxxF2d0a9Ir2lK3","Be That Easy","week one: the song stuck in your head"],
+    treadmill:["5KADKKJqxxF2d0a9Ir2lK3","Be That Easy","week one: the song stuck in your head"],
+    wave:["13VXVxePp4NUiXwtmQ0viz","Said Sum (Remix)","the gym song you put me on to"],
+    hearts:["2aTf0R0TQCJJKcb0ipszD2","SOMEBODY LOVES ME PT. 2","I sent you this two days later"],
+    lights:["4MJpGGIDRwHuWoZCddIOgM","ILYSMIH","you sent this one Jan 9"],
+    ski:["4KDNRh9Oor80z3XIxdWlui","Bubbly","you sent this one Jan 23"],
+    subway:["2LTRSoho4n35jXJBYZrpwp","All Of My Friends","I sent this one Mar 16"],
+    carpet:["5HCTbcF18u5DcYNwEWWf3n","Ayonha","you sent this one Mar 4"],
+    road:["1fA0xIPAY6TKNwsjQrOQ11","All Your Time","you sent this one Jul 15"],
+    graph:["7L4G39PVgMfaeHRyi1ML7y","Day Dreaming","you sent this one Jul 18"],
+    eq:["7zO8pvhMf6s1DzMMiV7CaU","NARI NARI NARI","I sent you this one Oct 20"],
+    home:["2KePS2HZdSVq8awIxIlWgn","Kings & Queens","the latest one you sent"]
+  };
+  const bg=document.getElementById('bg'), bgBtn=document.getElementById('bgBtn');
+  const pill=document.getElementById('pill'), txt=document.getElementById('pillTxt'), card=document.getElementById('dockCard'), why=document.getElementById('dockWhy'), frame=document.getElementById('dockFrame');
+  let api=null, ctrl=null, made=false, spPlaying=false, curId=null, curLine='start', pending=null;
+  let bgWanted=true;   // false once she pauses it herself
+  bg.volume=.75;
+
+  const esc=t=>t.replace(/&/g,'&amp;').replace(/</g,'&lt;');
+  function ui(){const on=!bg.paused;pill.classList.toggle('on',on||spPlaying);bgBtn.textContent=on?'❚❚':'▶';
+    if(card.classList.contains('closed'))txt.textContent=spPlaying?'♫ '+(SONGS[curLine]||SONGS.start)[1]:(on?'♫ While We’re Young':'♫ tap for music');}
+  function playBg(){if(!bgWanted||spPlaying)return;const p=bg.play();if(p&&p.catch)p.catch(()=>{});}
+  function pauseBg(){bg.pause()}
+  bg.addEventListener('play',ui);bg.addEventListener('pause',ui);
+  window.startBg=()=>{bgWanted=true;playBg()};   // called by the passcode screen on unlock
+  // first touch anywhere also starts it (needed where there's no passcode screen)
+  const first=()=>{removeEventListener('pointerdown',first,true);if(bg.paused&&bgWanted&&!spPlaying)playBg()};
+  addEventListener('pointerdown',first,true);
+  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden'){pauseBg();if(ctrl&&spPlaying)try{ctrl.pause()}catch(e){}}});
+  bgBtn.addEventListener('click',e=>{e.stopPropagation();if(bg.paused){bgWanted=true;if(spPlaying&&ctrl){try{ctrl.pause()}catch(e){}spPlaying=false}const p=bg.play();if(p&&p.catch)p.catch(()=>{})}else{bgWanted=false;pauseBg()}});
+
+  window.onSpotifyIframeApiReady=a=>{api=a;if(pending){const p=pending;pending=null;p()}};
+  const sc=document.createElement('script');sc.src='https://open.spotify.com/embed/iframe-api/v1';sc.async=true;sc.onerror=()=>{api=false};document.head.appendChild(sc);
+
+  function setWhy(line,label){const s=SONGS[line]||SONGS.start;why.innerHTML=`${esc(label||s[2])}<small>this part’s song · ${esc(s[1])} · tap ▶ to switch to it</small>`}
+  function fallback(id){frame.innerHTML=`<a class="fallback" href="https://open.spotify.com/track/${id}" target="_blank" rel="noopener"><span>Open in Spotify</span><span>▶</span></a>`}
+  function make(id){
+    made=true;
+    const go=()=>api.createController(document.getElementById('spEmbed'),{uri:'spotify:track:'+id,width:'100%',height:80},c=>{ctrl=c;
+      c.addListener('playback_update',e=>{const now=!e.data.isPaused&&e.data.position>0||(!e.data.isPaused&&!e.data.isBuffering);
+        if(now&&!spPlaying){spPlaying=true;pauseBg()}else if(!now&&spPlaying&&e.data.isPaused){spPlaying=false;playBg()}ui()})});
+    if(api)go();else if(api===false)fallback(id);else{pending=go;setTimeout(()=>{if(!ctrl&&!api){api=false;pending=null;fallback(id)}},6000)}
+  }
+  function load(id){
+    if(id===curId)return;curId=id;
+    if(!made){if(!card.classList.contains('closed'))make(id);return}
+    if(api===false){fallback(id);return}
+    if(ctrl)ctrl.loadUri('spotify:track:'+id);
+  }
+  function section(line){
+    curLine=line;const s=SONGS[line]||SONGS.start;setWhy(line);
+    // scrolled past a song she was playing: stop it and bring the background song back
+    if(spPlaying&&ctrl){try{ctrl.pause()}catch(e){}spPlaying=false;playBg()}
+    load(s[0]);ui();
+  }
+  pill.addEventListener('click',()=>{
+    const show=card.classList.contains('closed');
+    card.classList.toggle('closed',!show);pill.setAttribute('aria-expanded',String(show));
+    if(show&&!made){curId=null;const s=SONGS[curLine]||SONGS.start;curId=s[0];make(s[0])}
+    if(show)txt.textContent='♫ hide player';else ui();
+    if(show&&bg.paused&&bgWanted&&!spPlaying)playBg();
+  });
+  const secs=[...document.querySelectorAll('.sec')];
+  function check(){const y=innerHeight*.44;let s=secs[0];for(const x of secs){if(x.getBoundingClientRect().top<=y)s=x}if(s.dataset.line!==curLine)section(s.dataset.line)}
+  let t=false;addEventListener('scroll',()=>{if(!t){t=true;requestAnimationFrame(()=>{check();t=false})}},{passive:true});
+  setWhy('start');ui();
+  // tapping a song in the playlist loads it in the player (she taps ▶ there to hear it)
+  document.getElementById('tracks').addEventListener('click',e=>{
+    const a=e.target.closest('a');if(!a||api===false)return;const m=a.href.match(/track\/([A-Za-z0-9]+)/);if(!m)return;
+    e.preventDefault();
+    if(card.classList.contains('closed'))pill.click();
+    const name=a.querySelector('b').textContent;
+    if(!made){curId=m[1];make(m[1])}else load(m[1]);
+    why.innerHTML=`picked from the playlist<small>${esc(name)} · tap ▶ to play it</small>`;
+  });
 })();
 </script>
 </body></html>
