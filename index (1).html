@@ -1,0 +1,944 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Year One">
+<meta name="theme-color" content="#111111">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" href="icon-180.png">
+<link rel="manifest" href="manifest.json">
+<meta name="robots" content="noindex,nofollow">
+<title>Grace &amp; Marwan, Year One</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shrikhand&family=Caveat:wght@600;700&family=Figtree:wght@400;600;800;900&family=DM+Mono:wght@500&family=DotGothic16&display=swap">
+<style>
+/* layout: one long scroll; two dots (G and M) ride a single line down the left edge that changes into each place's own track, while the sky behind moves through the seasons of the year */
+:root{
+  --ink:#231a35; --cream:#fffaf2; --pink:#ff4fa3; --blue:#2350d8; --sun:#ffd23f;
+  --gline:#6cbe45; --mline:#ff6319; --white:#fffdf9;
+  --imblue:#1d8bf8; --imgrey:#e6e5ea; --imtext:#111;
+  --fg:var(--cream); --inv:var(--ink); --hi:var(--sun); --lo:var(--pink);
+  --display:"Shrikhand",Georgia,serif;
+  --hand:"Caveat","Bradley Hand",cursive;
+  --body:"Figtree",system-ui,-apple-system,sans-serif;
+  --mono:"DM Mono",ui-monospace,Menlo,monospace;
+  --dot:"DotGothic16","DM Mono",monospace;
+  --railx:22px;
+  color-scheme:light;
+}
+[hidden]{display:none!important}
+html{scroll-behavior:smooth}
+html,body{overflow-x:hidden;overflow-x:clip;max-width:100%;overscroll-behavior-x:none}
+body{touch-action:pan-y}
+.ads{touch-action:pan-x pan-y;overscroll-behavior-x:contain}
+.zine,.season{overflow:hidden;overflow:clip}
+
+body{margin:0;background:#1a1530;color:var(--fg);font-family:var(--body);-webkit-tap-highlight-color:transparent;overflow-x:hidden;transition:color .8s}
+body.light{--fg:var(--ink);--inv:var(--cream)}
+body[data-sky="dusk"]{--hi:#ffe14d;--lo:#6b3fa0}
+body[data-sky="fall"]{--hi:#fff1c7;--lo:#7a2e3a}
+body[data-sky="winter"]{--hi:#ff7ac0;--lo:#2350d8}
+body[data-sky="spring"]{--hi:#ff4fa3;--lo:#2350d8}
+body[data-sky="summer"]{--hi:#2350d8;--lo:#ff4fa3}
+body[data-sky="golden"]{--hi:#ffe14d;--lo:#8a3fb5}
+
+.skies{position:fixed;inset:0;z-index:0}
+.sky{position:absolute;inset:0;opacity:0;transition:opacity 1.2s ease}
+.sky.on{opacity:1}
+.sky.dusk{background:radial-gradient(circle at 70% 78%,rgba(255,236,150,.95) 0 9%,rgba(255,200,120,.5) 16%,transparent 34%),linear-gradient(180deg,#ffb15c,#ff5e8a 52%,#5b2a8f)}
+.sky.fall{background:radial-gradient(circle at 20% 15%,rgba(255,214,120,.55),transparent 40%),linear-gradient(180deg,#ffb347,#e2552b 52%,#6e1f2c)}
+.sky.winter{background:radial-gradient(circle at 78% 12%,#fdfbea 0 4%,rgba(253,251,234,.35) 7%,transparent 16%),linear-gradient(180deg,#070d26,#1d2f6b 58%,#5872b8)}
+.sky.spring{background:radial-gradient(circle at 25% 10%,rgba(255,255,255,.8),transparent 35%),linear-gradient(180deg,#a8dcff,#ffc2de 58%,#fff0f5)}
+.sky.summer{background:radial-gradient(circle at 80% 8%,#fffbd1 0 6%,rgba(255,240,140,.6) 12%,transparent 30%),linear-gradient(180deg,#19b5ff,#7fd8ff 52%,#fff09a)}
+.sky.golden{background:radial-gradient(circle at 30% 80%,rgba(255,220,140,.7),transparent 38%),linear-gradient(180deg,#ffc06b,#ff6f9f 52%,#7a2fb0)}
+.season{position:fixed;z-index:45;left:0;right:0;top:34vh;display:flex;justify-content:center;pointer-events:none}
+.season b{font:400 clamp(46px,15vw,84px)/1 var(--display);color:#fff;text-shadow:4px 4px 0 rgba(0,0,0,.25),0 0 30px rgba(255,255,255,.6);white-space:nowrap;opacity:0}
+.season small{display:block;font:500 13px var(--mono);letter-spacing:.14em;text-transform:uppercase;text-align:center;margin-top:8px;text-shadow:0 1px 4px rgba(0,0,0,.4)}
+.season.go b{animation:sweep 2s cubic-bezier(.3,.7,.3,1) forwards}
+@keyframes sweep{0%{transform:translateX(70vw) skewX(-12deg);opacity:0}22%{transform:translateX(0) skewX(0);opacity:1}72%{transform:translateX(0) scale(1.04);opacity:1}100%{transform:translateX(-70vw) skewX(12deg);opacity:0}}
+.flash{position:fixed;inset:0;z-index:44;pointer-events:none;background:#fff;opacity:0}
+.flash.go{animation:fl .7s ease-out}
+@keyframes fl{0%{opacity:.45}100%{opacity:0}}
+#wx{position:fixed;inset:0;z-index:1;pointer-events:none}
+
+.chip{position:fixed;z-index:30;top:calc(10px + env(safe-area-inset-top,0px));right:max(12px,calc((100vw - 480px)/2 + 12px));font:500 12px var(--mono);letter-spacing:.06em;background:rgba(20,14,30,.72);color:#fff;padding:7px 11px;border-radius:999px;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);transition:transform .25s}
+.chip.bump{transform:scale(1.12)}
+
+.zine{position:relative;z-index:2;max-width:480px;margin:0 auto}
+.sec{position:relative;padding:56px 18px 64px 58px;display:flex;flex-direction:column;gap:22px}
+.rail{position:absolute;top:0;bottom:0;left:calc(var(--railx) - 9px);width:18px;z-index:0}
+.travel{position:fixed;z-index:20;top:44vh;left:calc(max(0px,(100vw - 480px)/2) + var(--railx));transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:3px;pointer-events:none}
+.travel .d{width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font:900 13px var(--body);color:#fff;box-shadow:0 2px 6px rgba(0,0,0,.35),0 0 0 2px #fff;transition:transform .5s cubic-bezier(.2,1.5,.4,1),background .4s}
+.travel .g{background:var(--pink)}.travel .m{background:var(--blue)}
+.travel .say{position:absolute;left:34px;top:10px;white-space:nowrap;background:#fff;color:var(--ink);font:700 18px/1 var(--hand);padding:6px 10px;border-radius:12px;box-shadow:0 3px 10px rgba(0,0,0,.2);opacity:0;transform:translateX(-6px) scale(.9);transition:opacity .3s,transform .3s}
+.travel .say.on{opacity:1;transform:none}
+.travel .say::before{content:"";position:absolute;left:-6px;top:10px;border:6px solid transparent;border-right-color:#fff;border-left:0}
+.travel .chair{position:relative;width:40px;height:14px;border:3px solid #333;border-top:0;border-radius:0 0 8px 8px;margin-top:-8px;opacity:0;transition:opacity .4s}
+.travel[data-line="treadmill"] .d{animation:jog .45s ease-in-out infinite alternate}
+.travel[data-line="treadmill"] .m{animation-delay:.22s}
+@keyframes jog{to{transform:translateY(-5px)}}
+.travel[data-line="wave"] .d{animation:beat .6s ease-in-out infinite}
+.travel[data-line="wave"] .m{animation-delay:.3s}
+@keyframes beat{50%{transform:scale(1.18)}}
+.travel[data-line="lights"] .d{box-shadow:0 0 0 2px #fff,0 0 16px 4px rgba(255,122,192,.8)}
+.travel[data-line="ski"] .chair{opacity:1}
+.travel[data-line="ski"]{animation:sway 2.4s ease-in-out infinite}
+@keyframes sway{0%,100%{transform:translateX(-50%) rotate(-3deg)}50%{transform:translateX(-50%) rotate(3deg)}}
+.travel[data-line="subway"] .g{background:var(--gline)}.travel[data-line="subway"] .m{background:var(--mline)}
+.travel[data-line="carpet"] .d{box-shadow:0 0 0 2px #ffd23f,0 2px 6px rgba(0,0,0,.35)}
+.travel[data-line="home"] .g{transform:translateY(14px) scale(1.1)}
+.travel[data-line="home"] .m{transform:translateY(-14px) scale(1.1)}
+
+.r-start{background:linear-gradient(transparent,rgba(255,255,255,.9) 40%);width:4px;left:calc(var(--railx) - 2px);border-radius:2px}
+.r-treadmill{background:repeating-linear-gradient(180deg,#2b2b2e 0 14px,#3a3a3e 14px 16px);border-left:3px solid #8b8f98;border-right:3px solid #8b8f98;animation:belt .6s linear infinite;width:22px;left:calc(var(--railx) - 11px);box-sizing:border-box}
+@keyframes belt{to{background-position:0 16px}}
+.r-wave{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='40'%3E%3Cpath d='M9 0 Q18 10 9 20 T9 40' fill='none' stroke='%23fffaf2' stroke-width='3'/%3E%3C/svg%3E") 0 0/18px 40px repeat-y;animation:wv 1.4s linear infinite}
+@keyframes wv{to{background-position:0 40px}}
+.r-hearts{background:radial-gradient(circle,#ff4fa3 4px,transparent 4.5px) 50% 0/18px 26px repeat-y}
+.r-hearts::before{content:"";position:absolute;left:8px;top:0;bottom:0;width:2px;background:rgba(255,255,255,.6);z-index:-1}
+.r-lights{background:linear-gradient(#222,#222) 50% 0/2px 100% no-repeat}
+.r-lights::after{content:"";position:absolute;inset:0;background:radial-gradient(circle,#ffd23f 4px,transparent 5px) 50% 0/18px 120px repeat-y,radial-gradient(circle,#ff7ac0 4px,transparent 5px) 50% 40px/18px 120px repeat-y,radial-gradient(circle,#7ad3ff 4px,transparent 5px) 50% 80px/18px 120px repeat-y;filter:drop-shadow(0 0 5px rgba(255,255,255,.9));animation:tw 1.6s steps(2) infinite}
+@keyframes tw{50%{opacity:.55}}
+.r-ski{background:linear-gradient(#2d2d33,#2d2d33) 50% 0/3px 100% no-repeat}
+.r-ski::after{content:"";position:absolute;left:-2px;right:-2px;top:0;bottom:0;background:linear-gradient(#55555c,#55555c) 50% 0/22px 10px repeat-y;background-size:22px 10px;background-repeat:repeat-y;-webkit-mask:repeating-linear-gradient(180deg,transparent 0 210px,#000 210px 220px);mask:repeating-linear-gradient(180deg,transparent 0 210px,#000 210px 220px)}
+.r-subway{display:flex;gap:4px;width:22px;left:calc(var(--railx) - 11px)}
+.r-subway i{flex:1;border-radius:6px;background:rgba(35,26,53,.18);position:relative;overflow:hidden}
+.r-subway i::after{content:"";position:absolute;left:0;right:0;top:0;height:var(--p,0%)}
+.r-subway i.g::after{background:var(--gline)}.r-subway i.m::after{background:var(--mline)}
+.r-carpet{width:30px;left:calc(var(--railx) - 15px);background:linear-gradient(90deg,#d4a017 0 3px,#b3132b 3px calc(100% - 3px),#d4a017 calc(100% - 3px));box-shadow:0 0 18px rgba(179,19,43,.4)}
+.r-road{width:26px;left:calc(var(--railx) - 13px);background:repeating-linear-gradient(180deg,#ffd23f 0 14px,transparent 14px 28px) 50% 0/3px 100% no-repeat,#3a3a40;border-left:2px solid #ddd;border-right:2px solid #ddd;box-sizing:border-box}
+.r-graph{width:34px;left:calc(var(--railx) - 17px)}
+.r-graph svg{width:100%;height:100%;overflow:visible;display:block}
+.r-eq{background:repeating-linear-gradient(180deg,#2350d8 0 4px,transparent 4px 9px);animation:eq 1s steps(4) infinite}
+@keyframes eq{0%{clip-path:inset(0 30% 0 0)}25%{clip-path:inset(0 0 0 0)}50%{clip-path:inset(0 55% 0 0)}75%{clip-path:inset(0 10% 0 0)}}
+.r-ribbon{width:8px;left:calc(var(--railx) - 4px);background:linear-gradient(var(--pink),#ff9ccf);border-radius:4px;bottom:40px}
+.endheart{position:absolute;left:calc(var(--railx) - 20px);bottom:14px;font-size:40px;line-height:1;z-index:1}
+
+.k{font:500 12px/1.35 var(--mono);letter-spacing:.1em;text-transform:uppercase;margin:0;opacity:.85}
+.place{align-self:flex-start;display:inline-flex;align-items:center;gap:8px;font:600 13px var(--body);padding:7px 12px;border-radius:999px;background:rgba(20,14,30,.7);color:#fff;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.h{font-family:var(--display);font-weight:400;font-size:clamp(32px,9vw,46px);line-height:1.03;margin:0;text-wrap:balance}
+.h .o,.num{color:var(--hi);text-shadow:3px 3px 0 var(--lo)}
+.num{font-family:var(--display);font-size:clamp(60px,19vw,110px);line-height:.9;margin:0;font-variant-numeric:tabular-nums}
+p{margin:0;font-size:17px;line-height:1.45;max-width:36ch}
+.hand{font:700 26px/1.1 var(--hand);color:var(--hi)}
+.tip{font:500 11px var(--mono);letter-spacing:.08em;text-transform:uppercase;opacity:.8;align-self:center;text-align:center}
+
+.pop{transition:transform .8s cubic-bezier(.2,1.35,.35,1)}
+.pop.pre{transform:translateY(46px) rotate(var(--pr,-5deg)) scale(.9)}
+
+.hero{min-height:100svh;justify-content:center;padding-top:80px}
+.meet{display:grid;gap:10px;font:700 26px/1.1 var(--hand)}
+.meet span{display:flex;align-items:center;gap:10px}
+.meet b{width:24px;height:24px;border-radius:50%;display:inline-grid;place-items:center;font:900 13px var(--body);color:#fff;box-shadow:0 0 0 2px #fff}
+.scrolldown{align-self:flex-start;font:500 12px var(--mono);letter-spacing:.1em;text-transform:uppercase;animation:nudge 1.4s ease-in-out infinite}
+@keyframes nudge{50%{transform:translateY(6px)}}
+
+.chat{display:flex;flex-direction:column;gap:4px}
+.b{max-width:84%;padding:8px 13px;border-radius:19px;font:400 16px/1.3 -apple-system,system-ui,var(--body);overflow-wrap:anywhere}
+.b.me{align-self:flex-end;background:var(--imblue);color:#fff;border-bottom-right-radius:5px}
+.b.her{align-self:flex-start;background:var(--imgrey);color:var(--imtext);border-bottom-left-radius:5px}
+.b.link{padding:0;max-width:none;align-self:flex-start;width:min(78%,250px);border-radius:16px;overflow:hidden;background:var(--imgrey);color:var(--imtext);text-decoration:none;display:block}
+.link .art{height:80px;display:grid;place-items:center;font:400 30px var(--display);color:#fff;background:linear-gradient(135deg,#1db954,#0e6b31)}
+.link .art.b2{background:linear-gradient(135deg,var(--pink),#7a1f52)}
+.link .meta{padding:8px 12px;display:grid;gap:1px}
+.link b{font:700 14px/1.2 -apple-system,system-ui,var(--body)}
+.link small{font:400 12px -apple-system,system-ui,var(--body);opacity:.6}
+.ts{align-self:center;font:500 11px var(--mono);opacity:.8;margin:6px 0 2px}
+.typing{align-self:flex-start;background:var(--imgrey);border-radius:19px;padding:11px 14px;display:flex;gap:4px}
+.typing.me{align-self:flex-end;background:var(--imblue)}
+.typing i{width:7px;height:7px;border-radius:50%;background:#8e8e93;animation:dot 1s infinite}
+.typing.me i{background:#cfe4ff}
+.typing i:nth-child(2){animation-delay:.15s}.typing i:nth-child(3){animation-delay:.3s}
+@keyframes dot{0%,60%,100%{transform:none;opacity:.5}30%{transform:translateY(-3px);opacity:1}}
+.b.pend{visibility:hidden}
+.b.typ{position:relative;color:transparent!important;overflow:hidden}
+.b.typ>*{visibility:hidden}
+.b.typ::after{content:"• • •";position:absolute;inset:0;display:flex;align-items:center;padding:0 14px;color:#8e8e93;font:900 18px/1 var(--body);letter-spacing:2px;animation:dotp 1s infinite}
+.b.me.typ::after{color:#fff;justify-content:flex-end}
+@keyframes dotp{50%{opacity:.35}}
+.popin{animation:bub .3s cubic-bezier(.2,1.5,.4,1) both}
+@keyframes bub{from{transform:scale(.5)}to{transform:none}}
+
+.btn{align-self:flex-start;display:inline-flex;align-items:center;gap:8px;padding:12px 18px;border-radius:999px;border:2px solid currentColor;background:transparent;color:inherit;font:700 15px var(--body);cursor:pointer;text-decoration:none}
+.btn.solid{background:var(--fg);color:var(--inv);border-color:var(--fg)}
+.btn:focus-visible,[tabindex]:focus-visible,button:focus-visible,a:focus-visible{outline:3px solid var(--hi);outline-offset:3px}
+
+.sticker{align-self:var(--side,flex-end);max-width:86%;transform:rotate(var(--rot,3deg));background:var(--c,var(--sun));color:var(--t,var(--ink));border-radius:16px;padding:12px 14px 13px;box-shadow:0 6px 0 rgba(0,0,0,.2);display:grid;gap:2px;position:relative}
+.sticker.pop.pre{transform:scale(1.6) rotate(calc(var(--rot,0deg) - 18deg))}
+.sticker b{font-family:var(--display);font-weight:400;font-size:clamp(26px,8vw,36px);line-height:1}
+.sticker span{font-size:14px;line-height:1.3;font-weight:600}
+
+.whiteboard{background:#fdfdfb;color:#1e3a8a;border:6px solid #b7bcc6;border-radius:6px;padding:14px;font:700 22px/1.25 var(--hand);transform:rotate(-1.5deg);box-shadow:0 8px 18px rgba(0,0,0,.25)}
+.whiteboard.pop.pre{transform:translateY(46px) rotate(8deg) scale(.9)}
+.whiteboard s{color:#c0392b;text-decoration-thickness:3px}
+.whiteboard small{display:block;font:500 11px var(--mono);color:#555;letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px}
+.timer{background:#0d0d0f;border-radius:12px;padding:14px;display:grid;gap:10px;box-shadow:0 10px 22px rgba(0,0,0,.35)}
+.timer .cap{font:500 11px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:#aaa}
+.timer .seg{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.timer .seg div{display:grid;justify-items:center;gap:2px;min-width:0}
+.timer b{font:400 clamp(26px,8vw,38px)/1 var(--dot);color:#ff3b30;text-shadow:0 0 10px rgba(255,59,48,.75);font-variant-numeric:tabular-nums}
+.timer span{font:500 10px var(--mono);color:#888;letter-spacing:.08em;text-transform:uppercase}
+
+.pol{background:var(--white);padding:9px 9px 36px;margin:0;box-shadow:0 12px 26px rgba(20,10,30,.3);position:relative;width:min(100%,270px);transform:rotate(var(--rot,0deg))}
+.pol.pop{transform:rotate(var(--rot,0deg))}
+.pol.pop.pre{transform:translateY(60px) rotate(calc(var(--rot,0deg) - 12deg)) scale(.88)}
+.pol img{display:block;width:100%;aspect-ratio:3/4;object-fit:cover;-webkit-user-drag:none;user-select:none}
+.pol.wide{width:min(100%,340px)}
+.pol.wide img{aspect-ratio:4/3}
+.pol.sq img{aspect-ratio:1}
+.pol figcaption{position:absolute;left:6px;right:6px;bottom:6px;text-align:center;font:700 22px/1 var(--hand);color:var(--ink)}
+.pol::before{content:"";position:absolute;top:-10px;left:50%;width:74px;height:22px;transform:translateX(-50%) rotate(-3deg);background:rgba(255,210,63,.72);z-index:2}
+.center{align-self:center}
+.dbl{position:absolute;left:50%;top:45%;font-size:80px;transform:translate(-50%,-50%) scale(0);pointer-events:none;z-index:5;animation:like .9s ease forwards}
+@keyframes like{30%{transform:translate(-50%,-50%) scale(1.2)}60%{transform:translate(-50%,-50%) scale(.95)}100%{transform:translate(-50%,-80%) scale(1);opacity:0}}
+.stack{position:relative;height:min(118vw,450px);cursor:pointer;width:100%}
+.stack .pol{position:absolute;left:50%;top:50%;width:min(86%,260px);transition:transform .45s cubic-bezier(.2,.8,.2,1)}
+
+.flips{display:grid;gap:12px}
+.flip{perspective:900px;height:150px;cursor:pointer}
+.flip:nth-child(1){--pr:-8deg;transform:rotate(-1.5deg)}.flip:nth-child(2){--pr:6deg;transform:rotate(1deg)}.flip:nth-child(3){--pr:-4deg;transform:rotate(-.5deg)}
+.flip .in2{position:relative;height:100%;transition:transform .6s cubic-bezier(.2,.8,.2,1);transform-style:preserve-3d}
+.flip.on .in2{transform:rotateY(180deg)}
+.flip .f,.flip .bk{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;justify-content:center;gap:6px}
+.flip .f{background:#fff7ec;color:var(--ink);box-shadow:0 6px 0 rgba(0,0,0,.18)}
+.flip .f b{font-family:var(--display);font-weight:400;font-size:25px;line-height:1.05;color:#c2410c}
+.flip .f span{font:500 11px var(--mono);letter-spacing:.1em;text-transform:uppercase;opacity:.75}
+.flip .f i{position:absolute;right:14px;bottom:10px;font:700 18px var(--hand);font-style:normal;color:#7a2e3a}
+.flip .bk{transform:rotateY(180deg);background:#fff;color:var(--ink);gap:3px;padding:10px 12px}
+.flip .bk .b{font-size:13px;padding:5px 10px}
+
+.scratch{position:relative;border-radius:16px;overflow:hidden;background:#fff7fb;padding:14px;display:flex;flex-direction:column;gap:4px;color:var(--ink)}
+.scratch canvas{position:absolute;inset:0;width:100%;height:100%;touch-action:none;cursor:crosshair;transition:opacity .6s}
+.scratch.clear canvas{opacity:0;pointer-events:none}
+
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.opt{padding:14px 10px;border-radius:14px;border:2px solid var(--fg);background:transparent;color:var(--fg);font:800 18px var(--body);cursor:pointer;transition:transform .2s}
+.opt:active{transform:scale(.96)}
+.opt.right{background:var(--fg);color:var(--inv)}
+.opt.wrong{opacity:.4;text-decoration:line-through}
+.reveal{display:grid;gap:12px;animation:rv .5s cubic-bezier(.2,1.3,.4,1)}
+@keyframes rv{from{transform:translateY(-8px) scale(.96);opacity:0}to{transform:none;opacity:1}}
+.quiz{display:flex;flex-direction:column;gap:16px}
+.opts{grid-template-columns:1fr 1fr}
+.duo{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.duo div{display:grid;gap:2px;min-width:0}
+.duo .n{font-family:var(--display);font-size:clamp(34px,10.5vw,56px);line-height:1;font-variant-numeric:tabular-nums;white-space:nowrap}
+.duo .n.w{color:var(--hi);text-shadow:3px 3px 0 var(--lo)}
+.duo small{font:500 12px var(--mono);letter-spacing:.08em;text-transform:uppercase}
+.names{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:baseline}
+.names span{font-family:var(--display);line-height:1}
+.names em{font:500 11px var(--mono);font-style:normal;opacity:.75;margin-left:3px}
+
+.sign{background:#111;color:#fff;border-radius:6px;padding:12px 14px;display:flex;align-items:center;gap:10px;font:800 19px/1.1 var(--body);position:relative}
+.sign::before{content:"";position:absolute;left:0;right:0;top:7px;height:2px;background:#fff}
+.sign small{display:block;font:500 12px var(--mono);opacity:.75;margin-top:3px}
+.bul{width:30px;height:30px;border-radius:50%;display:inline-grid;place-items:center;font:900 17px var(--body);color:#fff;flex:none}
+.bul.g{background:var(--gline)}.bul.m{background:var(--mline)}
+.stop{position:relative;display:grid;gap:12px}
+.stop::before{content:"";position:absolute;left:-49px;top:0;width:26px;height:26px;border-radius:50%;background:#fff;border:5px solid #111;box-sizing:border-box;z-index:3}
+.stop h3{margin:0;font:900 22px/1.1 var(--body);letter-spacing:-.01em}
+.ads{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;padding:6px 2px 14px;scrollbar-width:none}
+.ads::-webkit-scrollbar{display:none}
+.ad{flex:0 0 86%;scroll-snap-align:start;border-radius:8px;padding:16px;display:grid;gap:8px;align-content:start;min-height:200px;box-shadow:0 6px 0 rgba(0,0,0,.18)}
+.ad .tag{font:500 10px var(--mono);letter-spacing:.1em;text-transform:uppercase;opacity:.75}
+.ad b{font-family:var(--display);font-weight:400;font-size:28px;line-height:1}
+.ad p{font-size:15px;line-height:1.35}
+.ad .fine{font:500 10px/1.3 var(--mono);opacity:.7;margin-top:auto}
+.a1{background:var(--sun);color:var(--ink)}.a2{background:#fff;color:var(--ink);border:3px solid var(--ink)}.a3{background:var(--pink);color:var(--ink)}.a4{background:var(--blue);color:#fff}.a5{background:var(--ink);color:#fff}.a6{background:var(--gline);color:var(--ink)}
+.dots{display:flex;gap:6px;justify-content:center}
+.dots i{width:7px;height:7px;border-radius:50%;background:currentColor;opacity:.3}
+.dots i.on{opacity:.95}
+
+.rope{display:flex;align-items:flex-start;justify-content:center}
+.rope i{width:14px;height:40px;background:linear-gradient(#e2c25b,#9c7c1c);border-radius:7px 7px 2px 2px;flex:none}
+.rope span{flex:1;height:18px;border-bottom:8px solid #b3132b;border-radius:0 0 50% 50%;margin-top:4px}
+
+.tl{list-style:none;margin:0;padding:0;display:grid;gap:14px}
+.tl li{display:grid;grid-template-columns:58px 1fr;gap:10px;align-items:start;background:rgba(255,255,255,.75);color:var(--ink);border-radius:12px;padding:10px}
+.tl .d{font:500 12px/1.3 var(--mono);text-transform:uppercase;color:var(--blue);padding-top:3px}
+.tl .w{display:grid;gap:5px;min-width:0;font-size:15px;line-height:1.35}
+.tl .b{max-width:100%;font-size:14px;padding:6px 11px}
+
+.panel{background:rgba(255,255,255,.78);color:var(--ink);border-radius:16px;padding:14px;display:grid;gap:12px}
+.chart{display:grid;grid-template-columns:repeat(14,1fr);gap:3px;align-items:end;height:160px}
+.bar{display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:4px;height:100%;cursor:pointer;background:none;border:0;padding:0;color:inherit}
+.bar i{display:block;width:100%;border-radius:4px 4px 0 0;background:var(--blue);opacity:.3;transition:opacity .2s,background .2s,height .9s cubic-bezier(.2,1.2,.4,1)}
+.bar.on i{background:var(--pink);opacity:1}
+.bar span{font:500 9px var(--mono)}
+.note{min-height:80px;display:grid;gap:4px}
+.note b{font-family:var(--display);font-weight:400;font-size:26px;color:var(--pink)}
+
+.emo{display:grid;grid-template-columns:repeat(5,1fr);text-align:center;gap:4px}
+.emo button{display:grid;gap:4px;background:none;border:0;color:inherit;cursor:pointer;padding:0}
+.emo .e{font-size:clamp(30px,9vw,46px);line-height:1;display:inline-block;transition:transform .3s cubic-bezier(.2,1.6,.4,1)}
+.emo button:first-child .e{font-size:clamp(40px,12vw,60px)}
+.emo button.boing .e{transform:scale(1.35) rotate(-10deg)}
+.emo small{font:500 12px var(--mono)}
+
+.player{background:#121016;color:#f4f0f6;border-radius:18px;overflow:hidden;box-shadow:0 14px 30px rgba(0,0,0,.35)}
+.player header{display:flex;gap:12px;align-items:center;padding:14px;background:linear-gradient(135deg,var(--pink),var(--blue))}
+.cover{width:58px;height:58px;border-radius:8px;background:var(--ink);display:grid;place-items:center;font:400 19px var(--display);color:var(--pink);flex:none}
+.player header b{display:block;font:800 18px/1.1 var(--body)}
+.player header small{font:500 11px var(--mono);opacity:.85}
+.filters{display:flex;gap:6px;padding:10px 12px;border-bottom:1px solid rgba(255,255,255,.1);flex-wrap:wrap}
+.filters button{border:1.5px solid rgba(255,255,255,.35);background:none;color:inherit;border-radius:999px;padding:5px 11px;font:600 13px var(--body);cursor:pointer}
+.filters button.on{background:#f4f0f6;color:#121016;border-color:#f4f0f6}
+.tracks{list-style:none;margin:0;padding:4px 0;max-height:420px;overflow-y:auto;overscroll-behavior:contain}
+.tracks a{display:grid;grid-template-columns:26px 1fr auto;gap:10px;align-items:center;padding:9px 14px;color:inherit;text-decoration:none}
+.tracks .no{font:500 12px var(--mono);opacity:.55}
+.tracks b{font-weight:700;font-size:15px;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tracks small{font:500 11px var(--mono);opacity:.65}
+.tracks .dot{width:9px;height:9px;border-radius:50%}
+.tracks li[hidden]{display:none}
+
+.letter{background:var(--white);color:var(--ink);border-radius:6px;padding:22px 18px;box-shadow:0 14px 30px rgba(0,0,0,.3);display:grid;gap:10px;transform:rotate(-1deg)}
+.letter.pop.pre{transform:translateY(46px) rotate(4deg) scale(.9)}
+.letter p{font:600 24px/1.18 var(--hand);max-width:none}
+.letter .sig{font:700 32px var(--hand);color:var(--pink)}
+.heart{position:fixed;font-size:26px;pointer-events:none;animation:float 1.7s ease-out forwards;z-index:50}
+@keyframes float{to{transform:translate(var(--dx),-280px) rotate(var(--r));opacity:0}}
+.foot{text-align:center;font:500 11px var(--mono);letter-spacing:.08em;text-transform:uppercase;opacity:.8}
+
+
+/* soundtrack dock */
+.dock{position:fixed;z-index:35;left:0;right:0;bottom:0;display:flex;justify-content:center;pointer-events:none;padding:0 12px calc(12px + env(safe-area-inset-bottom,0px))}
+.dock .in{pointer-events:auto;width:100%;max-width:456px;display:grid;gap:8px;justify-items:end}
+.dock .card{width:100%;background:rgba(18,16,22,.92);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-radius:16px;padding:10px;display:grid;gap:8px;color:#f4f0f6;box-shadow:0 10px 30px rgba(0,0,0,.4);transform-origin:bottom right;transition:transform .35s cubic-bezier(.2,1.3,.4,1),opacity .25s}
+.dock .card.closed{transform:scale(.6) translateY(30px);opacity:0;pointer-events:none;position:absolute;bottom:56px}
+.bgrow{display:flex;align-items:center;gap:10px;padding:2px 4px 6px;border-bottom:1px solid rgba(255,255,255,.12)}
+.bgrow b{display:block;font:800 15px/1.2 var(--body)}
+.bgrow small{font:500 11px var(--mono);opacity:.7}
+.bgbtn{width:38px;height:38px;border-radius:50%;border:0;background:#ff4fa3;color:#fff;font:800 13px var(--body);cursor:pointer;flex:none}
+.dock .why{font:700 19px/1.15 var(--hand);color:#ffd23f;min-height:22px;padding:0 4px}
+.dock .why small{display:block;font:500 10px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:#bbb}
+/* unused */.dock .frame{height:80px;border-radius:12px;overflow:hidden;background:#282330}
+.dock .frame iframe{border:0;width:100%;height:80px;display:block}
+.dock .fallback{display:flex;align-items:center;justify-content:space-between;gap:10px;height:80px;padding:0 14px;color:#f4f0f6;text-decoration:none;font:700 15px var(--body)}
+.pill{display:inline-flex;align-items:center;gap:10px;border:0;border-radius:999px;padding:8px 14px 8px 8px;background:#121016;color:#fff;font:700 14px var(--body);cursor:pointer;box-shadow:0 6px 18px rgba(0,0,0,.35);max-width:100%}
+.pill .vinyl{width:30px;height:30px;border-radius:50%;flex:none;background:radial-gradient(circle,#ff4fa3 0 5px,#111 5.5px 7px,#222 7.5px 9px,#111 9.5px 11px,#2a2a2a 11.5px 13px,#111 13.5px);animation:spin 2.4s linear infinite;animation-play-state:paused}
+.pill.on .vinyl{animation-play-state:running}
+@keyframes spin{to{transform:rotate(360deg)}}
+.pill span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.pill.nudge{animation:nud .6s cubic-bezier(.2,1.6,.4,1)}
+@keyframes nud{40%{transform:scale(1.12)}}
+.zine{padding-bottom:70px}
+@media (prefers-reduced-motion:reduce){
+  .pill .vinyl{animation:none}
+  html{scroll-behavior:auto}
+  .pop,.pop.pre{transition:none}
+  .typing i,.popin,.dbl,.scrolldown,.travel,.travel .d,.rail,.rail::after{animation:none!important}
+  .flip .in2,.stack .pol,.sky{transition:none}
+}
+</style>
+
+</head><body>
+<style>
+#lock{position:fixed;inset:0;z-index:100;background:linear-gradient(160deg,#2350d8,#ff4fa3);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;font-family:-apple-system,system-ui,sans-serif;padding:env(safe-area-inset-top,0) 16px env(safe-area-inset-bottom,0)}
+#lock[hidden]{display:none}
+#lock .t{font-size:20px;font-weight:600}
+#lock .hint{font-size:13px;opacity:.85;text-align:center;max-width:28ch}
+#lock .pd{display:flex;gap:16px}
+#lock .pd i{width:13px;height:13px;border-radius:50%;border:1.5px solid #fff}
+#lock .pd i.f{background:#fff}
+#lock .pd.shake{animation:sh .4s}
+@keyframes sh{20%,60%{transform:translateX(-10px)}40%,80%{transform:translateX(10px)}}
+#lock .kp{display:grid;grid-template-columns:repeat(3,76px);gap:16px}
+#lock .kp button{width:76px;height:76px;border-radius:50%;border:0;background:rgba(255,255,255,.22);color:#fff;font:400 32px -apple-system,system-ui,sans-serif;cursor:pointer}
+#lock .kp button:active{background:rgba(255,255,255,.5)}
+#lock .kp .x{background:none;font-size:16px}
+</style>
+<div id="lock">
+  <div class="t">Enter Passcode</div>
+  <div class="pd" id="pd"><i></i><i></i><i></i><i></i></div>
+  <div class="hint">hint: our anniversary</div>
+  <div class="kp" id="kp"></div>
+</div>
+<script>
+(function(){
+  var CODE="1014", lock=document.getElementById('lock'), pd=document.getElementById('pd'), kp=document.getElementById('kp'), v="";
+  
+  ["1","2","3","4","5","6","7","8","9","","0","⌫"].forEach(function(k){var b=document.createElement('button');b.type='button';b.textContent=k;if(!k){b.style.visibility='hidden'}if(k==='⌫')b.className='x';
+    b.onclick=function(){if(k==='⌫'){v=v.slice(0,-1)}else if(v.length<4){v+=k}draw();if(v.length===4){if(v===CODE){if(window.startBg)window.startBg();setTimeout(function(){lock.hidden=true},200)}else{pd.classList.add('shake');setTimeout(function(){pd.classList.remove('shake');v="";draw()},450)}}};kp.appendChild(b)});
+  function draw(){[].forEach.call(pd.children,function(d,i){d.className=i<v.length?'f':''})}
+  addEventListener('pageshow',function(e){if(e.persisted){v='';draw();lock.hidden=false}});
+  document.addEventListener('visibilitychange',function(){if(document.visibilityState==='hidden'){v='';draw();lock.hidden=false}});
+})();
+</script>
+
+<div class="skies" aria-hidden="true">
+  <div class="sky dusk on"></div><div class="sky fall"></div><div class="sky winter"></div>
+  <div class="sky spring"></div><div class="sky summer"></div><div class="sky golden"></div>
+</div>
+<canvas id="wx" aria-hidden="true"></canvas>
+<div class="flash" id="flash" aria-hidden="true"></div>
+<div class="season" id="season" aria-live="polite"><b id="seasonTxt"></b></div>
+<span class="chip" id="chip">☀️ Sep 2025</span>
+<div class="travel" id="travel" data-line="start" aria-hidden="true">
+  <span class="d g">G</span><span class="d m">M</span><span class="chair"></span>
+  <span class="say" id="say">here we go</span>
+</div>
+
+<audio id="bg" src="song.mp3" preload="auto" playsinline></audio>
+<div class="dock" id="dock">
+  <div class="in">
+    <div class="card closed" id="dockCard">
+      <div class="bgrow"><button class="bgbtn" id="bgBtn" type="button" aria-label="Play or pause the music">❚❚</button><span><b id="nowTitle">While We’re Young</b><small id="nowSub">Jhené Aiko · our song</small></span></div>
+      <div class="why" id="dockWhy"></div>
+    </div>
+    <button class="pill" id="pill" type="button" aria-expanded="false" aria-controls="dockCard"><span class="vinyl" aria-hidden="true"></span><span id="pillTxt">♫ tap for music</span></button>
+  </div>
+</div>
+<main class="zine">
+
+<section class="sec hero" data-sky="dusk" data-line="start" data-chip="☀️ Sep 2025" data-say="here we go">
+  <div class="rail r-start"></div>
+  <p class="k">Year one · a scrolling story</p>
+  <h1 class="h">Our year,<br><span class="o">in 24,266 texts.</span></h1>
+  <div class="meet">
+    <span><b style="background:var(--pink)">G</b> this is you</span>
+    <span><b style="background:var(--blue)">M</b> this is me</span>
+  </div>
+  <p>Follow us down the line. It changes a lot. So did we.</p>
+  <span class="scrolldown">scroll ↓</span>
+</section>
+
+<section class="sec" id="start" data-sky="dusk" data-line="treadmill" data-chip="☀️ Sep 9, 2025" data-say="the treadmill">
+  <div class="rail r-treadmill"></div>
+  <span class="place">📍 The gym · Tue, Sep 9, 2025 · 8:03 PM</span>
+  <h2 class="h">It started with <span class="o">“Hi this is grace.”</span></h2>
+  <div class="chat replay">
+    <div class="b her">Hi this is grace</div>
+    <div class="b her">I’m otw</div>
+    <div class="b me">You’re not gonna flex on me too hard in the gym, right?</div>
+    <div class="b her">Nah tdy was supposed to be my rest day</div>
+    <div class="b her">I’ll go west</div>
+    <div class="b me">and you’re still coming for me? you must really think I’m worth the workout</div>
+    <div class="b her">I hope so</div>
+    <div class="b her">I’m pretty much here</div>
+    <div class="b me">i’m outside on the benches awaiting your arrival</div>
+  </div>
+  <div class="whiteboard pop"><small>Today’s schedule</small>Grace: <s>rest day</s> gym date<br>Status: rescheduled forever</div>
+  <div class="ts">10:52 PM</div>
+  <div class="chat replay">
+    <div class="b me">Had a great time with you tonight, hope it was worth not resting today</div>
+    <div class="b her">Definitely I had a rlly good time too I’d def like to do it again</div>
+    <div class="b me">I was hoping you’d say that, guess I get to steal another one of your rest days. When are you free next?</div>
+    <div class="b her">R u free Sunday?</div>
+  </div>
+  <div class="timer pop" style="--pr:-4deg">
+    <span class="cap">Total time since set one</span>
+    <div class="seg"><div><b id="cD">0</b><span>days</span></div><div><b id="cH">00</b><span>hrs</span></div><div><b id="cM">00</b><span>min</span></div><div><b id="cS">00</b><span>sec</span></div></div>
+  </div>
+  <div class="quiz">
+    <p class="k">Pop quiz</p>
+    <h2 class="h">Who replies <span class="o">faster?</span></h2>
+    <div class="opts guess" data-answer="m"><button class="opt" data-v="g">Grace</button><button class="opt" data-v="m">Marwan</button></div>
+    <div class="reveal" hidden><div class="duo"><div><span class="n w">30 sec</span><small>Marwan</small></div><div><span class="n">1 min</span><small>Grace</small></div></div><p>Typical reply time. Nobody’s playing hard to get.</p></div>
+  </div>
+</section>
+
+<section class="sec" data-sky="dusk" data-line="wave" data-chip="☀️ Sep 16, 2025" data-say="a sound wave">
+  <div class="rail r-wave"></div>
+  <span class="place">🎧 One week in · Tue, Sep 16 · 9:58 AM</span>
+  <h2 class="h">Then came <span class="o">the music.</span></h2>
+  <div class="chat replay">
+    <div class="b me">random but do you ever get stuck on one song and just play it on repeat for days</div>
+    <div class="b her">Yes I can’t get this song out of my head</div>
+    <a class="b link" href="https://open.spotify.com/track/5KADKKJqxxF2d0a9Ir2lK3" target="_blank" rel="noopener"><div class="art">♫</div><div class="meta"><b>Be That Easy</b><small>open.spotify.com</small></div></a>
+    <div class="b her">I think cause it’s all over my tiktok</div>
+    <div class="b me">this is the first i’ve heard of it, lowkey your fyp sounds way diff from mine, kinda wanna know what else is on it</div>
+    <div class="b me">good song tho, i didn’t expect the chill vibes</div>
+    <div class="b me">at gym rn it lowkey helped the set ngl</div>
+    <div class="b her">I can’t listen to chill music in the gym</div>
+    <div class="b her">It’s makes me want to fall asleep I need like rlly heavy drums or something</div>
+    <div class="b me">i got 3 more sets, put me on to something you’d listen to at the gym</div>
+    <a class="b link" href="https://open.spotify.com/track/13VXVxePp4NUiXwtmQ0viz" target="_blank" rel="noopener"><div class="art b2">♫</div><div class="meta"><b>Said Sum (feat. City Girls &amp; DaBaby) - Remix</b><small>open.spotify.com</small></div></a>
+  </div>
+  <p class="hand" style="transform:rotate(-2deg)">chill songs for the car, heavy drums for the gym. noted.</p>
+</section>
+
+<section class="sec" data-sky="fall" data-line="hearts" data-chip="🍂 Fall 2025" data-say="a trail of firsts">
+  <div class="rail r-hearts"></div>
+  <span class="place">🍂 Fall 2025 · tap each card</span>
+  <h2 class="h">The little <span class="o">firsts.</span></h2>
+  <div class="flips">
+    <div class="flip pop" tabindex="0" role="button"><div class="in2">
+      <div class="f"><span>Sep 23, 2025</span><b>First heart emoji</b><i>tap ↻</i></div>
+      <div class="bk"><div class="b her">Good luck on ur interview 💗</div><div class="b me">Thanks cutie, you’re the good luck charm fr</div></div>
+    </div></div>
+    <div class="flip pop" tabindex="0" role="button"><div class="in2">
+      <div class="f"><span>Oct 22, 2025</span><b>First “miss you”</b><i>tap ↻</i></div>
+      <div class="bk"><div class="b her">Miss u already</div><div class="b me">you’re adorable</div><div class="b me">i missed you when you said you had to leave ngl</div></div>
+    </div></div>
+    <div class="flip pop" tabindex="0" role="button"><div class="in2">
+      <div class="f"><span>Nov 8, 2025</span><b>First “date night”</b><i>tap ↻</i></div>
+      <div class="bk"><div class="b me">i deadass told them i can’t do this</div><div class="b me">“this is a important haircut i have date night coming up”</div><div class="b her">Lmaooo</div><div class="b her">Fr nothing but the best for dg date night</div></div>
+    </div></div>
+  </div>
+  <div class="quiz">
+    <p class="k">Pop quiz</p>
+    <h2 class="h">Who says “miss you” <span class="o">more?</span></h2>
+    <div class="opts guess" data-answer="m"><button class="opt" data-v="g">Grace</button><button class="opt" data-v="m">Marwan</button></div>
+    <div class="reveal" hidden><div class="duo"><div><span class="n w">82</span><small>Marwan</small></div><div><span class="n">81</span><small>Grace</small></div></div><p>He wins by one. ONE. Basically a tie.</p></div>
+  </div>
+  <figure class="pol wide like pop center" tabindex="0" style="--rot:-3deg"><img src="112.jpg" alt="Grace cuddling a dog"><figcaption>both cute</figcaption></figure>
+  <p class="tip">double-tap any photo to ♥</p>
+</section>
+
+<section class="sec" data-sky="winter" data-line="lights" data-chip="❄️ Dec 13, 2025" data-say="string lights">
+  <div class="rail r-lights"></div>
+  <span class="place">❄️ Sat, Dec 13, 2025 · 11:26 PM</span>
+  <h2 class="h">The first one <span class="o">in writing.</span></h2>
+  <div class="scratch" id="scratch">
+    <div class="chat">
+      <div class="b her">Good luck</div>
+      <div class="b me">ty i’ll need it</div>
+      <div class="b me">pov the spurs might actually win</div>
+      <div class="b me">i love you 😘</div>
+      <div class="ts">11:46 PM</div>
+      <div class="b her">Love u too</div>
+      <div class="b her">I’m going to bed soon</div>
+      <div class="b her">Get some rest you’ll feel better</div>
+      <div class="b her">Gn 💗</div>
+    </div>
+    <canvas aria-label="Scratch to reveal the messages"></canvas>
+  </div>
+  <p>You said it first, in person. He just got it in writing first.</p>
+  <div class="quiz">
+    <p class="k">Pop quiz</p>
+    <h2 class="h">Who says <span class="o">goodnight</span> more?</h2>
+    <div class="opts guess" data-answer="g"><button class="opt" data-v="g">Grace</button><button class="opt" data-v="m">Marwan</button></div>
+    <div class="reveal" hidden><div class="duo"><div><span class="n w">144</span><small>Grace</small></div><div><span class="n">122</span><small>Marwan</small></div></div><p>You win the night shift.</p></div>
+  </div>
+  <div class="sticker pop" style="--rot:-3deg;--side:flex-start;--c:#7ad3ff"><b>441</b><span>texts sent between midnight and 4 AM. Go to sleep.</span></div>
+
+  <p class="k">Pop quiz</p>
+  <h2 class="h">Who’s sent more <span class="o">I love yous?</span></h2>
+  <div class="opts guess" data-answer="g"><button class="opt" data-v="g">Grace</button><button class="opt" data-v="m">Marwan</button></div>
+  <div class="reveal" hidden>
+    <div class="duo"><div><span class="n w">146</span><small>Grace</small></div><div><span class="n">107</span><small>Marwan</small></div></div>
+    <p>He typed it first. She types it more.</p>
+  </div>
+
+  <p class="k">Pop quiz, part 2</p>
+  <h2 class="h">What does he call you <span class="o">most?</span></h2>
+  <div class="opts guess" data-answer="baby">
+    <button class="opt" data-v="sweetie">sweetie</button><button class="opt" data-v="baby">baby</button>
+    <button class="opt" data-v="princess">princess</button><button class="opt" data-v="beautiful">beautiful</button>
+  </div>
+  <div class="reveal" hidden>
+    <div class="names">
+      <span style="font-size:50px;color:var(--hi);text-shadow:3px 3px 0 var(--lo)">baby<em>397</em></span>
+      <span style="font-size:36px">sweetie<em>327</em></span>
+      <span style="font-size:28px">beautiful<em>147</em></span>
+      <span style="font-size:24px">princess<em>90</em></span>
+      <span style="font-size:20px">my love<em>62</em></span>
+      <span style="font-size:17px">sunshine<em>17</em></span>
+      <span style="font-size:15px">gorgeous<em>13</em></span>
+    </div>
+    <p class="hand">your nickname count for him is… lower. much lower.</p>
+  </div>
+</section>
+
+<section class="sec" data-sky="winter" data-line="ski" data-chip="🎿 Mar 2026" data-say="a ski lift">
+  <div class="rail r-ski"></div>
+  <span class="place">🎿 The family ski trip · March 2026</span>
+  <figure class="pol wide like pop" tabindex="0" style="--rot:-2deg"><img src="547.jpg" alt="Grace and Marwan in ski gear"><figcaption>first family trip</figcaption></figure>
+  <p>You brought him on the family ski trip. He survived. Mostly.</p>
+</section>
+
+<section class="sec" id="city" data-sky="spring" data-line="subway" data-chip="🗽 2026 · NYC" data-say="the G &amp; M lines">
+  <div class="rail r-subway"><i class="g" id="railG"></i><i class="m" id="railM"></i></div>
+  <div class="sign pop"><span class="bul g">G</span><span class="bul m">M</span><span>Grace &amp; Marwan Lines<small>Rarely on time. Always together.</small></span></div>
+  <div class="stop">
+    <p class="k">Stop 1 · Feb 2026</p>
+    <h3>The art exhibit</h3>
+    <figure class="pol like pop" tabindex="0" style="--rot:-4deg"><img src="148.jpg" alt="Marwan sitting inside an art installation"><figcaption>main character energy</figcaption></figure>
+    <figure class="pol wide like pop" tabindex="0" style="--rot:3deg;justify-self:end;width:min(70%,230px)"><img src="147.jpg" alt="A subway entrance at night lit purple"><figcaption>the way there</figcaption></figure>
+  </div>
+  <div class="stop">
+    <p class="k">Stop 2 · Madison Square Garden</p>
+    <h3>Knicks game</h3>
+    <figure class="pol wide like pop" tabindex="0" style="--rot:2deg"><img src="546.jpg" alt="Grace and Marwan smiling at the Knicks game"><figcaption>us at the Garden</figcaption></figure>
+    <figure class="pol like pop" tabindex="0" style="--rot:-5deg;justify-self:end;width:min(56%,190px)"><img src="232.jpg" alt="View of the court at Madison Square Garden"><figcaption>the view</figcaption></figure>
+  </div>
+  <div class="stop">
+    <p class="k">Stop 3 · Coney Island · Apr 28</p>
+    <h3>The aquarium date</h3>
+    <div class="stack" data-stack>
+      <figure class="pol"><img src="302.jpg" alt="Grace and Marwan smiling at Coney Island"><figcaption>the aquarium date</figcaption></figure>
+      <figure class="pol"><img src="282.jpg" alt="Marwan in front of the jellyfish tank"><figcaption>jellyfish guy</figcaption></figure>
+      <figure class="pol"><img src="251.jpg" alt="Grace at dinner"><figcaption>dinner after</figcaption></figure>
+    </div>
+    <p class="tip">tap to shuffle</p>
+  </div>
+  <div class="stop">
+    <p class="k">Ads in this car · swipe →</p>
+    <div class="ads" id="ads">
+      <div class="ad a1"><span class="tag">Public service announcement</span><b>Sorry?</b><p>Marwan said “sorry” 301 times this year. Grace: 118.</p><p class="fine">Apology hotline open 24/7. Results may vary.</p></div>
+      <div class="ad a2"><span class="tag">Language learning</span><b>Say “pov” like a native</b><p>Marwan: 513 times. Grace: 5. Lessons available.</p><p class="fine">Tuition: one (1) good morning text.</p></div>
+      <div class="ad a3"><span class="tag">Car service</span><b>“here”</b><p>140 pickups this year. Driver texts “here,” you text “Coming.”</p><p class="fine">No surge pricing. Tips accepted in kisses.</p></div>
+      <div class="ad a5"><span class="tag">The People v. Spelling</span><b>tmr or tmrw?</b><p>Grace: “tmr” 157 times. Marwan: “tmrw” 211 times. The case remains open.</p><p class="fine">Jury still out. Possibly forever.</p></div>
+    </div>
+    <div class="dots" id="adDots"></div>
+  </div>
+  <div class="stop">
+    <p class="k">Stop 4 · ???</p>
+    <h3>Next stop: wherever you want</h3>
+    <p>The line keeps going. You pick the next one.</p>
+  </div>
+</section>
+
+<section class="sec" data-sky="spring" data-line="carpet" data-chip="🌸 Apr 11, 2026" data-say="the red carpet">
+  <div class="rail r-carpet"></div>
+  <span class="place">🌸 Formal night · Sat, Apr 11, 2026</span>
+  <div class="rope" aria-hidden="true"><i></i><span></span><i></i><span></span><i></i></div>
+  <div class="stack" data-stack>
+    <figure class="pol"><img src="225.jpg" alt="Grace in a pink dress and Marwan in a suit"><figcaption>the pink dress</figcaption></figure>
+    <figure class="pol"><img src="228.jpg" alt="Marwan kissing Grace on the cheek"><figcaption>😘</figcaption></figure>
+    <figure class="pol"><img src="222.jpg" alt="Grace and Marwan under neon lights"><figcaption>later that night</figcaption></figure>
+  </div>
+  <p class="tip">tap to shuffle</p>
+  <h2 class="h">Best-dressed couple. <span class="o">No contest.</span></h2>
+</section>
+
+<section class="sec" data-sky="summer" data-line="road" data-chip="🌞 Summer 2026" data-say="the commute">
+  <div class="rail r-road"></div>
+  <span class="place">🌞 Spring → summer 2026</span>
+  <h2 class="h">In each other’s <span class="o">corner.</span></h2>
+  <ul class="tl">
+    <li class="pop" style="--pr:-3deg"><span class="d">Mar 13</span><div class="w">He writes you a full cheat sheet for your Bausch Health interview.</div></li>
+    <li class="pop" style="--pr:3deg"><span class="d">May 19</span><div class="w">His graduation day.<div class="b her">I’m so proud of u</div></div></li>
+    <li class="pop" style="--pr:-3deg"><span class="d">Jun 1</span><div class="w">Your first day.<div class="b me">can’t wait to hear all about ur first day today</div></div></li>
+    <li class="pop" style="--pr:3deg"><span class="d">Jun 8</span><div class="w"><div class="b me">i got the job!!!!!</div></div></li>
+    <li class="pop" style="--pr:-3deg"><span class="d">Jun 15</span><div class="w">His first day.<div class="b her">How r u feeling abt ur first day</div></div></li>
+  </ul>
+  <div class="quiz">
+    <p class="k">Pop quiz</p>
+    <h2 class="h">Who texts first <span class="o">in the morning?</span></h2>
+    <div class="opts guess" data-answer="m"><button class="opt" data-v="g">Grace</button><button class="opt" data-v="m">Marwan</button></div>
+    <div class="reveal" hidden><div class="duo"><div><span class="n w">247</span><small>Marwan</small></div><div><span class="n">126</span><small>Grace</small></div></div><p>mornings he texted first. 307 good mornings from him, 230 from you.</p></div>
+  </div>
+  <div class="quiz">
+    <p class="k">Pop quiz, part 2</p>
+    <h2 class="h">What time do we text <span class="o">the most?</span></h2>
+    <div class="opts guess" data-answer="11"><button class="opt" data-v="9">9 AM</button><button class="opt" data-v="11">11 AM</button><button class="opt" data-v="16">4 PM</button><button class="opt" data-v="22">10 PM</button></div>
+    <div class="reveal" hidden><div class="duo"><div><span class="n w">11 AM</span><small>1,956 texts</small></div><div><span class="n">4 PM</span><small>1,934 texts</small></div></div><p>Peak hours: the middle of the workday. Very productive, both of us.</p></div>
+  </div>
+</section>
+
+<section class="sec" data-sky="summer" data-line="graph" data-chip="📈 The whole year" data-say="a chart (nerd)">
+  <div class="rail r-graph"><svg id="graphRail" preserveAspectRatio="none" viewBox="0 0 34 100"></svg></div>
+  <span class="place">📈 The numbers</span>
+<div class="quiz">
+    <p class="k">Pop quiz</p>
+    <h2 class="h">What was our <span class="o">busiest month?</span></h2>
+    <div class="opts guess" data-answer="jun"><button class="opt" data-v="dec">Dec ’25</button><button class="opt" data-v="jan">Jan ’26</button><button class="opt" data-v="may">May ’26</button><button class="opt" data-v="jun">Jun ’26</button></div>
+    <div class="reveal" hidden><div class="panel"><p class="k">Texts per month · tap a month</p><div class="chart" id="chart"></div><div class="note" id="note"></div></div></div>
+  </div>
+  <div class="quiz">
+    <p class="k">Pop quiz</p>
+    <h2 class="h">Who’s sent more texts <span class="o">overall?</span></h2>
+    <div class="opts guess" data-answer="m"><button class="opt" data-v="g">Grace</button><button class="opt" data-v="m">Marwan</button></div>
+    <div class="reveal" hidden><div class="duo"><div><span class="n w">12,638</span><small>Marwan</small></div><div><span class="n">11,628</span><small>Grace</small></div></div><p>He wins by 1,010. Mostly “good morning beautiful.”</p></div>
+  </div>
+  <div class="quiz">
+    <p class="k">Pop quiz</p>
+    <h2 class="h">Who laughs <span class="o">more?</span></h2>
+    <div class="opts guess" data-answer="m"><button class="opt" data-v="g">Grace</button><button class="opt" data-v="m">Marwan</button></div>
+    <div class="reveal" hidden><div class="duo"><div><span class="n w">845</span><small>Marwan</small></div><div><span class="n">282</span><small>Grace</small></div></div><p>lols, lmaos, hahas and 😭s. You’re funnier than you think. Or he laughs at everything.</p></div>
+  </div>
+  <p class="k">Your top emojis · tap them</p>
+  <div class="emo">
+    <button type="button"><span class="e">😭</span><small>#1</small></button>
+    <button type="button"><span class="e">💗</span><small>#2</small></button>
+    <button type="button"><span class="e">😘</span><small>#3</small></button>
+    <button type="button"><span class="e">🥰</span><small>#4</small></button>
+    <button type="button"><span class="e">😔</span><small>#5</small></button>
+  </div>
+  <h2 class="h">Crying first, hearts second. <span class="o">Accurate.</span></h2>
+</section>
+
+<section class="sec" data-sky="summer" data-line="eq" data-chip="🎶 On repeat" data-say="the aux cord">
+  <div class="rail r-eq"></div>
+  <span class="place">🎶 Every song we sent each other</span>
+<div class="quiz">
+    <p class="k">Pop quiz</p>
+    <h2 class="h">Who sent <span class="o">more songs?</span></h2>
+    <div class="opts guess" data-answer="m"><button class="opt" data-v="g">Grace</button><button class="opt" data-v="m">Marwan</button></div>
+    <div class="reveal" hidden><div class="duo"><div><span class="n w">16</span><small>Marwan</small></div><div><span class="n">14</span><small>Grace</small></div></div><p>Close race. Scroll the whole list below.</p></div>
+  </div>
+  <div class="player pop">
+    <header><div class="cover">G♥M</div><div><b>Year One</b><small>30 songs · Grace &amp; Marwan</small></div></header>
+    <div class="filters" role="group" aria-label="Filter songs">
+      <button type="button" class="on" data-f="all">All</button><button type="button" data-f="g">From Grace</button><button type="button" data-f="m">From Marwan</button>
+    </div>
+    <ol class="tracks" id="tracks"></ol>
+  </div>
+  <p class="hand" style="transform:rotate(-2deg)">range: Arabic classics to “Fuck Ya Butt.” we contain multitudes.</p>
+</section>
+
+<section class="sec" data-sky="golden" data-line="home" data-chip="🍂 Year one" data-say="home">
+  <div class="rail r-ribbon"></div>
+  <span class="place">🍂 Back to fall · full circle</span>
+  <figure class="pol sq like pop center" tabindex="0" style="--rot:-2deg;width:min(100%,300px)"><img src="549.jpg" alt="Happy GF Day heart collage of Grace and Marwan"><figcaption>happy gf day</figcaption></figure>
+  <p>Every day is GF Day. This one just had a graphic.</p>
+  <p class="k">One year, added up</p>
+  <p class="num" data-count="24266">24,266</p>
+  <p>texts. About 65 a day, every day, for 373 days.</p>
+  <p class="hand">and I’d still rather hear it in person.</p>
+  <div class="letter pop">
+    <p>Grace,</p>
+    <p>It all started with “Hi this is grace” and a girl skipping her rest day for a guy she barely knew.</p>
+    <p>Now look at us. You’re the first person I want to tell everything to. Your name popping up on my phone is still my favorite notification, and somehow I still get butterflies every time I see you.</p>
+    <p>I didn’t know a year could feel this short and this full at the same time. I love you more than I’ll ever fit into a text, and I’m so lucky I get to keep trying.</p>
+    <p>Happy one year, baby. I’d skip every rest day for you.</p>
+    <span class="sig">— Marwan</span>
+  </div>
+  <div style="display:flex;gap:10px;flex-wrap:wrap">
+    <button class="btn solid" id="love" type="button">💗 send love</button>
+    <a class="btn" href="#start">↺ ride again</a>
+  </div>
+  <p class="foot" style="padding-bottom:70px">year two starts now</p>
+  <span class="endheart" aria-hidden="true">💗</span>
+</section>
+</main>
+
+<script>
+(function(){
+  const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const secs=[...document.querySelectorAll('.sec')];
+  const skies={};document.querySelectorAll('.sky').forEach(s=>skies[s.classList[1]]=s);
+  const light=new Set(['spring','summer']);
+  const travel=document.getElementById('travel'), say=document.getElementById('say'), chip=document.getElementById('chip');
+  let curSec=null, sayT, wxMode='dusk';
+  function setSection(s){
+    if(s===curSec)return;curSec=s;
+    const sky=s.dataset.sky;
+    Object.entries(skies).forEach(([k,el])=>el.classList.toggle('on',k===sky));
+    document.body.dataset.sky=sky;document.body.classList.toggle('light',light.has(sky));
+    if(travel.dataset.line!==s.dataset.line){travel.dataset.line=s.dataset.line;say.innerHTML=s.dataset.say;say.classList.add('on');clearTimeout(sayT);sayT=setTimeout(()=>say.classList.remove('on'),1800)}
+    chip.textContent=s.dataset.chip;if(!reduce){chip.classList.remove('bump');void chip.offsetWidth;chip.classList.add('bump')}
+    if(sky!==wxMode&&ready)announce(sky);
+    wxMode=sky;
+  }
+  let ready=false;
+  const names={dusk:'Late summer ☀️',fall:'Fall 🍂',winter:'Winter ❄️',spring:'Spring 🌸',summer:'Summer 🌞',golden:'Fall again 🍁'};
+  const subs={dusk:'where it started',fall:'the leaves are turning',winter:'bundle up',spring:'everything’s blooming',summer:'heat wave',golden:'full circle'};
+  const seasonEl=document.getElementById('season'), seasonTxt=document.getElementById('seasonTxt'), flash=document.getElementById('flash');
+  function announce(sky){
+    seasonTxt.innerHTML=names[sky]+'<small>'+subs[sky]+'</small>';
+    if(reduce)return;
+    seasonEl.classList.remove('go');flash.classList.remove('go');void seasonEl.offsetWidth;seasonEl.classList.add('go');flash.classList.add('go');
+    gust=1;
+  }
+  const city=document.getElementById('city'), railG=document.getElementById('railG'), railM=document.getElementById('railM');
+  function onScroll(){
+    const y=innerHeight*.44;let s=secs[0];
+    for(const x of secs){if(x.getBoundingClientRect().top<=y)s=x}
+    setSection(s);
+    const r=city.getBoundingClientRect();const p=Math.max(0,Math.min(1,(y-r.top)/r.height));
+    railG.style.setProperty('--p',(reduce?100:p*100)+'%');railM.style.setProperty('--p',(reduce?100:Math.max(0,p*100-3))+'%');
+  }
+  let tick=false;addEventListener('scroll',()=>{if(!tick){tick=true;requestAnimationFrame(()=>{onScroll();tick=false})}},{passive:true});
+
+  const cv=document.getElementById('wx'), cx=cv.getContext('2d');let W,H;
+  const fit=()=>{const d=devicePixelRatio||1;W=innerWidth;H=innerHeight;cv.width=W*d;cv.height=H*d;cx.setTransform(d,0,0,d,0,0)};fit();addEventListener('resize',fit);
+  const parts=Array.from({length:120},()=>({x:Math.random(),y:Math.random(),s:Math.random()*.7+.5,ph:Math.random()*6.28,r:Math.random()*6.28}));
+  const counts_={dusk:45,fall:75,winter:120,spring:70,summer:40,golden:75};
+  const leafE=['🍂','🍁','🍂','🍁'];let gust=0;
+  function draw(t){
+    cx.clearRect(0,0,W,H);
+    const n=counts_[wxMode]||40, g=1+gust*3, wind=gust*.006;
+    gust*=.975;
+    cx.textAlign='center';cx.textBaseline='middle';
+    for(let i=0;i<n;i++){const p=parts[i];
+      const px=p.x*W, py=p.y*H;
+      if(wxMode==='winter'){p.y+=.0022*p.s*g;p.x+=Math.sin(t/1200+p.ph)*.0008+wind;
+        if(i%9===0){cx.globalAlpha=.9;cx.font=`${12+p.s*12}px serif`;cx.fillText('❄️',px,py)}
+        else{cx.globalAlpha=1;cx.fillStyle='rgba(255,255,255,.9)';cx.beginPath();cx.arc(px,py,2+p.s*3.2,0,7);cx.fill()}}
+      else if(wxMode==='fall'||wxMode==='golden'){p.y+=.0018*p.s*g;p.x+=Math.sin(t/800+p.ph)*.002+wind;p.r+=.035*p.s;
+        cx.save();cx.translate(px,py);cx.rotate(p.r);cx.globalAlpha=.95;cx.font=`${16+p.s*16}px serif`;cx.fillText(leafE[i%4],0,0);cx.restore()}
+      else if(wxMode==='spring'){p.y+=.0014*p.s*g;p.x+=Math.sin(t/1000+p.ph)*.0016+wind;p.r+=.025;
+        cx.save();cx.translate(px,py);cx.rotate(p.r);cx.globalAlpha=.92;
+        if(i%5===0){cx.font=`${14+p.s*12}px serif`;cx.fillText('🌸',0,0)}else{cx.fillStyle='rgba(255,140,190,.9)';cx.beginPath();cx.ellipse(0,0,6*p.s+3,3.5*p.s+2,0,0,7);cx.fill()}cx.restore()}
+      else if(wxMode==='summer'){p.y-=.0007*p.s*g;p.x+=Math.sin(t/1400+p.ph)*.0006+wind;const a=.45+.45*Math.sin(t/400+p.ph);
+        cx.globalAlpha=a;cx.fillStyle='#fffbd1';cx.beginPath();cx.arc(px,py,2+p.s*3,0,7);cx.fill();
+        if(i%6===0){cx.font=`${12+p.s*10}px serif`;cx.fillText('✨',px,py)}}
+      else{p.y-=.0006*p.s*g;p.x+=Math.sin(t/1500+p.ph)*.0007+wind;const a=.4+.5*Math.sin(t/450+p.ph);
+        cx.globalAlpha=Math.max(0,a);cx.fillStyle='#fff3a6';cx.shadowColor='#ffd23f';cx.shadowBlur=10;cx.beginPath();cx.arc(px,py,2+p.s*2.6,0,7);cx.fill();cx.shadowBlur=0}
+      if(p.y>1.05){p.y=-.05;p.x=Math.random()}if(p.y<-.06){p.y=1.04;p.x=Math.random()}if(p.x>1.05)p.x=-.05;if(p.x<-.05)p.x=1.05;
+    }
+    cx.globalAlpha=1;
+    requestAnimationFrame(draw);
+  }
+  if(!reduce)requestAnimationFrame(draw);
+
+  const counts=[775,1343,1512,1865,2021,1584,1418,1595,2584,3298,3048,1057,1851,315];
+  (function(){const svg=document.getElementById('graphRail');const X=c=>(4+c/3298*26).toFixed(1),Y=i=>(i/(counts.length-1)*100).toFixed(1);
+    svg.innerHTML=`<polyline points="${counts.map((c,i)=>X(c)+','+Y(i)).join(' ')}" fill="none" stroke="#2350d8" stroke-width="3" vector-effect="non-scaling-stroke" stroke-linejoin="round"/>`})();
+
+  const songs=[["Be That Easy","g","Sep 16, 2025","5KADKKJqxxF2d0a9Ir2lK3","track"],["Said Sum (feat. City Girls & DaBaby) - Remix","g","Sep 16, 2025","13VXVxePp4NUiXwtmQ0viz","track"],["SOMEBODY LOVES ME PT. 2","m","Sep 18, 2025","2aTf0R0TQCJJKcb0ipszD2","track"],["dance party recession pop thursday morning","g","Sep 18, 2025","37i9dQZF1FbFtDfIarTEnG","playlist"],["Red Bull (playlist)","g","Sep 18, 2025","76pFgeNbp8pPP9kz95wsZl","playlist"],["Vibessss (playlist)","m","Sep 18, 2025","7sPfSm3eu6xbObQ4Yy0M7N","playlist"],["Hagaraan Ala Al Shesha","m","Oct 20, 2025","7mjrovxCbFPlnkJ1aDhtu9","track"],["NARI NARI NARI","m","Oct 20, 2025","7zO8pvhMf6s1DzMMiV7CaU","track"],["Forgive Me","m","Oct 20, 2025","6GZ1fXt4LMbYxqsh4KkzoU","track"],["Too Fast","g","Nov 22, 2025","0QyJXG36Q3Kta662XS8GhY","track"],["DELRESTO (ECHOES)","g","Nov 24, 2025","6EpZVG2zXeXGUitW8979U8","track"],["Airplane Mode (playlist)","m","Jan 8, 2026","56HyYDmzcEcFEfWP4HXVpQ","playlist"],["ILYSMIH","g","Jan 9, 2026","4MJpGGIDRwHuWoZCddIOgM","track"],["Bubbly","g","Jan 23, 2026","4KDNRh9Oor80z3XIxdWlui","track"],["WOOPAAA","g","Feb 12, 2026","7bXbTuAqOq7OzPb27NS0ZV","track"],["Ayonha","g","Mar 4, 2026","5HCTbcF18u5DcYNwEWWf3n","track"],["All Of My Friends","m","Mar 16, 2026","2LTRSoho4n35jXJBYZrpwp","track"],["Fuck Ya Butt","g","Apr 24, 2026","0oZaQXBtEQPtVX1wtsMSsA","track"],["YAYA","m","Jun 20, 2026","1uALqmxOYLMGJGOzwSypXF","track"],["NINI","m","Jun 20, 2026","1RTtg5LOy7r5rtwBIA5DBx","track"],["TROLLZ","m","Jun 20, 2026","3xIzkKqp7oe37NEVrcPjGS","track"],["Wackelkontakt","m","Jun 26, 2026","4x7j9ed3FRH6CHj27kiTQ3","track"],["All Your Time","g","Jul 15, 2026","1fA0xIPAY6TKNwsjQrOQ11","track"],["Day Dreaming","g","Jul 18, 2026","7L4G39PVgMfaeHRyi1ML7y","track"],["Konnichiwa","m","Jul 30, 2026","2d0UrqT7OYP0gcntGV2rsp","track"],["Over","m","Aug 3, 2026","6BdgtqiV3oXNqBikezwdvC","track"],["Controlla Freestyle","m","Aug 5, 2026","1DyUe6OZxW5c7jN1MhUvyH","track"],["678","m","Sep 20, 2026","0RZnx3YbepVt8MrrjU0Zyg","track"],["SaWaDiKa","m","Sep 22, 2026","1VWiDyYTrqQhhmnWANWkFa","track"],["Kings & Queens","g","Sep 24, 2026","2KePS2HZdSVq8awIxIlWgn","track"]];
+  const tl=document.getElementById('tracks');
+  songs.forEach((s,i)=>{const li=document.createElement('li');li.dataset.who=s[1];const a=document.createElement('a');a.href=`https://open.spotify.com/${s[4]}/${s[3]}`;a.target='_blank';a.rel='noopener';
+    a.innerHTML=`<span class="no">${String(i+1).padStart(2,'0')}</span><span style="min-width:0"><b></b><small>${s[1]==='g'?'from Grace':'from Marwan'} · ${s[2]}</small></span><span class="dot" style="background:var(${s[1]==='g'?'--pink':'--imblue'})"></span>`;
+    a.querySelector('b').textContent=s[0];li.appendChild(a);tl.appendChild(li)});
+  document.querySelectorAll('.filters button').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('.filters button').forEach(x=>x.classList.toggle('on',x===b));tl.querySelectorAll('li').forEach(li=>li.hidden=b.dataset.f!=='all'&&li.dataset.who!==b.dataset.f);tl.scrollTop=0}));
+
+  // chat replay: bubbles keep their space (no page jumping), wait until she stops scrolling, then type out one by one
+  const chatBoxes=[...document.querySelectorAll('.replay')];
+  if(!reduce)chatBoxes.forEach(box=>[...box.children].forEach(m=>{if(m.classList.contains('b'))m.classList.add('pend')}));
+  function finish(box){clearTimeout(box._t);box.dataset.done='1';box.querySelectorAll('.b').forEach(m=>m.classList.remove('pend','typ'))}
+  function replay(box){
+    if(box.dataset.done||box.dataset.run)return;box.dataset.run='1';
+    const msgs=[...box.querySelectorAll('.b.pend')];let i=0;
+    (function next(){
+      if(i>=msgs.length){finish(box);return}
+      const m=msgs[i++];m.classList.remove('pend');m.classList.add('typ');
+      box._t=setTimeout(()=>{m.classList.remove('typ');m.classList.add('popin');box._t=setTimeout(next,140)},Math.min(750,280+m.textContent.length*7));
+    })();
+  }
+  let idle;
+  function chatCheck(){
+    const vh=innerHeight;
+    chatBoxes.forEach(box=>{if(box.dataset.done)return;const r=box.getBoundingClientRect();
+      if(r.bottom<vh*.15){finish(box);return}            // scrolled past it: just show everything
+      if(r.top<vh*.62&&r.bottom>vh*.2)replay(box)});
+  }
+  if(!reduce){addEventListener('scroll',()=>{clearTimeout(idle);idle=setTimeout(chatCheck,160)},{passive:true});setTimeout(chatCheck,400)}
+  function countUp(el){if(reduce)return;const target=+el.dataset.count,t0=performance.now();(function f(t){const p=Math.min(1,(t-t0)/1500);el.textContent=Math.round(target*(1-Math.pow(1-p,3))).toLocaleString();if(p<1)requestAnimationFrame(f)})(t0)}
+
+  const io=new IntersectionObserver(es=>es.forEach(e=>{if(!e.isIntersecting)return;const el=e.target;io.unobserve(el);
+    if(el.classList.contains('pre'))requestAnimationFrame(()=>el.classList.remove('pre'));
+    if(el.dataset.count)countUp(el);if(el.id==='chart')growChart()}),{threshold:.3});
+  document.querySelectorAll('.pop,[data-count],#chart').forEach(el=>{if(el.getBoundingClientRect().top>innerHeight*.9){if(!reduce&&el.classList.contains('pop'))el.classList.add('pre');io.observe(el)}});
+
+  function burst(x,y,n){for(let i=0;i<n;i++){const h=document.createElement('span');h.className='heart';h.textContent=['💗','💕','💖','❤️'][i%4];h.style.left=(x+(Math.random()*40-20))+'px';h.style.top=y+'px';h.style.setProperty('--dx',(Math.random()*220-110)+'px');h.style.setProperty('--r',(Math.random()*60-30)+'deg');h.style.animationDelay=(i*55)+'ms';document.body.appendChild(h);setTimeout(()=>h.remove(),2800)}}
+  document.getElementById('love').addEventListener('click',e=>{if(reduce)return;const b=e.currentTarget.getBoundingClientRect();burst(b.left+b.width/2,b.top,16)});
+  document.querySelectorAll('.pol.like').forEach(f=>{let last=0;f.addEventListener('click',()=>{const now=Date.now();if(now-last<320&&!reduce){const h=document.createElement('span');h.className='dbl';h.textContent='❤️';f.appendChild(h);setTimeout(()=>h.remove(),950)}last=now})});
+  document.querySelectorAll('.flip').forEach(f=>{f.addEventListener('click',()=>f.classList.toggle('on'));f.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();f.classList.toggle('on')}})});
+  document.querySelectorAll('.guess').forEach(g=>g.querySelectorAll('.opt').forEach(b=>b.addEventListener('click',()=>{const right=b.dataset.v===g.dataset.answer;g.querySelectorAll('.opt').forEach(o=>{o.classList.toggle('right',o.dataset.v===g.dataset.answer);o.classList.toggle('wrong',o.dataset.v!==g.dataset.answer);o.disabled=true});g.nextElementSibling.hidden=false;if(g.nextElementSibling.querySelector('#chart')){growChart();pick(9)}if(right&&!reduce){const r=b.getBoundingClientRect();burst(r.left+r.width/2,r.top,8)}})));
+  document.querySelectorAll('.emo button').forEach(b=>b.addEventListener('click',()=>{b.classList.add('boing');setTimeout(()=>b.classList.remove('boing'),350)}));
+  document.querySelectorAll('[data-stack]').forEach(s=>{const rots=[-4,5,-8,3,7,-2];const lay=()=>[...s.children].forEach((f,i)=>{f.style.zIndex=10-i;f.style.transform=`translate(-50%,-50%) translate(${(i%2?1:-1)*i*7}px,${i*5}px) rotate(${rots[i%rots.length]}deg)`});lay();
+    s.addEventListener('click',()=>{const t=s.firstElementChild;if(!reduce)t.style.transform+=' translateX(130%) rotate(20deg)';setTimeout(()=>{s.appendChild(t);lay()},reduce?0:260)})});
+  const ads=document.getElementById('ads'), adDots=document.getElementById('adDots');[...ads.children].forEach(()=>adDots.appendChild(document.createElement('i')));
+  const markAd=()=>{const w=ads.firstElementChild.offsetWidth+12;const i=Math.round(ads.scrollLeft/w);[...adDots.children].forEach((d,k)=>d.classList.toggle('on',k===i))};ads.addEventListener('scroll',markAd,{passive:true});markAd();
+
+  (function(){const box=document.getElementById('scratch'),c=box.querySelector('canvas');let started=false,x,r;
+    function setup(){const d=devicePixelRatio||1;r=box.getBoundingClientRect();c.width=Math.round(r.width*d);c.height=Math.round(r.height*d);x=c.getContext('2d');x.setTransform(d,0,0,d,0,0)}
+    const paint=()=>{setup();x.globalCompositeOperation='source-over';const g=x.createLinearGradient(0,0,r.width,r.height);g.addColorStop(0,'#2a3f7a');g.addColorStop(1,'#ff7ac0');x.fillStyle=g;x.fillRect(0,0,r.width,r.height);
+      x.fillStyle='#fff';x.textAlign='center';x.textBaseline='middle';const lines=['scratch the frost','❄︎'];let fs=34;x.font=`700 ${fs}px Caveat, cursive`;while(fs>16&&x.measureText(lines[0]).width>r.width-40){fs-=2;x.font=`700 ${fs}px Caveat, cursive`}
+      x.fillText(lines[0],r.width/2,r.height/2-fs*.45);x.fillText(lines[1],r.width/2,r.height/2+fs*.65);x.globalCompositeOperation='destination-out'};
+    paint();if(document.fonts)document.fonts.ready.then(()=>{if(!started)paint()});
+    addEventListener('resize',()=>{if(!started&&!box.classList.contains('clear'))paint()});
+    if('ResizeObserver' in window)new ResizeObserver(()=>{if(!started)paint()}).observe(box);
+    let down=false;
+    const dig=e=>{const b=c.getBoundingClientRect();x.beginPath();x.arc(e.clientX-b.left,e.clientY-b.top,24,0,7);x.fill()};
+    c.addEventListener('pointerdown',e=>{down=true;started=true;c.setPointerCapture(e.pointerId);dig(e)});c.addEventListener('pointermove',e=>{if(down)dig(e)});
+    c.addEventListener('pointerup',()=>{down=false;const dd=x.getImageData(0,0,c.width,c.height).data;let cl=0,n=0;for(let i=3;i<dd.length;i+=160){n++;if(dd[i]===0)cl++}if(cl/n>.45)box.classList.add('clear')})})();
+
+  const months=[["Sep '25","The gym date. She skipped a rest day."],["Oct","First “miss u already.”"],["Nov","Date night, and a very important haircut."],["Dec","Dec 13: the first “i love you” in text."],["Jan '26","Over 2,000 texts in a month for the first time."],["Feb","The art exhibit in the city."],["Mar","The family ski trip, and your Bausch interview."],["Apr","The pink dress, the Knicks, the aquarium."],["May","His graduation, and a lot of waiting on job offers."],["Jun","Both of you started new jobs. Most texts ever."],["Jul","Happy GF Day."],["Aug","Lightest month of the year. We’ll allow it."],["Sep","One year since “Hi this is grace.”"],["Oct","So far. Still going."]];
+  const chart=document.getElementById('chart'),note=document.getElementById('note');
+  months.forEach((m,i)=>{const b=document.createElement('button');b.className='bar';b.type='button';b.setAttribute('aria-label',m[0]+': '+counts[i]+' texts');const h=Math.max(3,counts[i]/3298*125);b.innerHTML=`<i style="height:${h}px" data-h="${h}"></i><span>${m[0].slice(0,1)}</span>`;b.addEventListener('click',()=>pick(i));chart.appendChild(b)});
+  function growChart(){if(reduce)return;const is=[...chart.querySelectorAll('i')];is.forEach(i=>i.style.height='3px');requestAnimationFrame(()=>requestAnimationFrame(()=>is.forEach((i,k)=>setTimeout(()=>i.style.height=i.dataset.h+'px',k*45))))}
+  function pick(i){[...chart.children].forEach((b,k)=>b.classList.toggle('on',k===i));note.innerHTML=`<span class="k">${months[i][0].replace("'","’")}</span><b>${counts[i].toLocaleString()} texts</b><p>${months[i][1]}</p>`}
+
+  const start=new Date('2025-09-09T20:03:22-04:00'),pad=n=>String(n).padStart(2,'0');
+  const cD=document.getElementById('cD'),cH=document.getElementById('cH'),cM=document.getElementById('cM'),cS=document.getElementById('cS');
+  function tm(){let s=Math.floor((Date.now()-start)/1000);cD.textContent=Math.floor(s/86400);s%=86400;cH.textContent=pad(Math.floor(s/3600));s%=3600;cM.textContent=pad(Math.floor(s/60));cS.textContent=pad(s%60)}
+  tm();setInterval(tm,1000);
+  onScroll();ready=true;
+})();
+</script>
+<script>
+(function(){
+  // "While We're Young" plays the whole way on a normal audio player.
+  // Song moments play through Web Audio, which the passcode tap unlocks once; after that
+  // the phone lets it start clips on its own while she scrolls. Jhené is muted underneath, then unmuted.
+  const MOMENTS={
+    wave:["5KADKKJqxxF2d0a9Ir2lK3","Be That Easy","the song stuck in your head, week one"],
+    lights:["4MJpGGIDRwHuWoZCddIOgM","ILYSMIH","you sent this one Jan 9"],
+    subway:["2LTRSoho4n35jXJBYZrpwp","All Of My Friends","I sent this one Mar 16"],
+    carpet:["4KDNRh9Oor80z3XIxdWlui","Bubbly","you sent this one Jan 23"],
+    road:["1fA0xIPAY6TKNwsjQrOQ11","All Your Time","you sent this one Jul 15"]
+  };
+  const NO_PREVIEW=new Set(["1DyUe6OZxW5c7jN1MhUvyH"]);
+  const BG={title:'While We’re Young',sub:'Jhené Aiko · our song'};
+  const au=document.getElementById('bg'), btn=document.getElementById('bgBtn');
+  const pill=document.getElementById('pill'), txt=document.getElementById('pillTxt'), card=document.getElementById('dockCard'), why=document.getElementById('dockWhy');
+  const nowTitle=document.getElementById('nowTitle'), nowSub=document.getElementById('nowSub');
+  au.loop=true;
+  try{if(navigator.audioSession)navigator.audioSession.type='playback'}catch(e){}
+  const AC=window.AudioContext||window.webkitAudioContext;
+  let ctx=null, out=null, src=null, srcGain=null, clipId=null, token=0, started=false, paused=false, curLine='start';
+  const cache=new Map(), broken=new Set();
+
+  function ensureCtx(){ // must run inside a tap
+    if(!AC)return;
+    if(!ctx){ctx=new AC();out=ctx.createGain();out.connect(ctx.destination);
+      const b=ctx.createBuffer(1,1,22050),s0=ctx.createBufferSource();s0.buffer=b;s0.connect(out);s0.start(0)}
+    if(ctx.state!=='running')ctx.resume();
+  }
+  function ui(){const on=started&&!paused;pill.classList.toggle('on',on);btn.textContent=on?'❚❚':'▶';
+    if(card.classList.contains('closed'))txt.textContent=started?'♫ '+nowTitle.textContent:'♫ tap for music'}
+  function show(t,sub,r){nowTitle.textContent=t;nowSub.textContent=sub;why.textContent=r||'';ui()}
+  function playBg(){au.muted=false;if(!paused&&au.paused){const p=au.play();if(p&&p.catch)p.catch(()=>{})}}
+
+  function load(id){
+    if(cache.has(id))return cache.get(id);
+    const p=fetch('prev_'+id+'.mp3').then(r=>{if(!r.ok)throw 0;return r.arrayBuffer()})
+      .then(buf=>new Promise((res,rej)=>ctx.decodeAudioData(buf,res,rej)))
+      .catch(e=>{broken.add(id);cache.delete(id);throw e});
+    cache.set(id,p);if(cache.size>8){const k=cache.keys().next().value;if(k!==id)cache.delete(k)}
+    return p;
+  }
+  function stopClip(){
+    if(src){const s1=src,g1=srcGain;try{g1.gain.setTargetAtTime(0,ctx.currentTime,.15);s1.stop(ctx.currentTime+.6)}catch(e){try{s1.stop()}catch(_){}}}
+    src=null;srcGain=null;clipId=null;
+  }
+  function toBg(){token++;stopClip();show(BG.title,BG.sub,'');if(started)playBg()}
+  function toClip(id,title,reason){
+    if(!ctx||broken.has(id)||NO_PREVIEW.has(id)){toBg();return}
+    if(clipId===id)return;
+    const my=++token;
+    load(id).then(buffer=>{
+      if(my!==token||paused)return;
+      stopClip();
+      const s1=ctx.createBufferSource(),g1=ctx.createGain();s1.buffer=buffer;s1.loop=true;
+      g1.gain.setValueAtTime(0,ctx.currentTime);g1.gain.linearRampToValueAtTime(1,ctx.currentTime+.5);
+      s1.connect(g1);g1.connect(out);s1.start();src=s1;srcGain=g1;clipId=id;
+      au.muted=true;                       // Jhené keeps running underneath, silently
+      show(title,'30-second preview',reason);
+    }).catch(()=>{if(my===token)toBg()});
+  }
+  function section(line){curLine=line;const m=MOMENTS[line];if(started&&!paused&&m)toClip(m[0],m[1],m[2]);else if(clipId||!m)toBg()}
+
+  function start(){ensureCtx();started=true;paused=false;playBg();
+    Object.values(MOMENTS).forEach(m=>{if(ctx)load(m[0]).catch(()=>{})}); // warm up the clips
+    const m=MOMENTS[curLine];if(m)toClip(m[0],m[1],m[2]);ui()}
+  window.startBg=start;
+  const first=()=>{removeEventListener('pointerdown',first,true);if(!started)start()};
+  addEventListener('pointerdown',first,true);
+  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden'){au.pause();stopClip();token++;if(ctx)ctx.suspend()}else if(ctx&&started&&!paused){ctx.resume()}});
+  btn.addEventListener('click',e=>{e.stopPropagation();
+    if(started&&!paused){paused=true;au.pause();token++;stopClip();show(BG.title,BG.sub,'paused');}
+    else{ensureCtx();started=true;paused=false;playBg();section(curLine)}ui()});
+  pill.addEventListener('click',()=>{const open=card.classList.contains('closed');card.classList.toggle('closed',!open);pill.setAttribute('aria-expanded',String(open));
+    if(!started)start();if(open)txt.textContent='♫ hide';else ui()});
+
+  const secs=[...document.querySelectorAll('.sec')];
+  function check(){const y=innerHeight*.5;let s=secs[0];for(const x of secs){if(x.getBoundingClientRect().top<=y)s=x}if(s.dataset.line!==curLine)section(s.dataset.line)}
+  let t=false;addEventListener('scroll',()=>{if(!t){t=true;requestAnimationFrame(()=>{check();t=false})}},{passive:true});
+
+  document.getElementById('tracks').addEventListener('click',e=>{
+    const a=e.target.closest('a');if(!a)return;const m=a.href.match(/track\/([A-Za-z0-9]+)/);if(!m||NO_PREVIEW.has(m[1])||broken.has(m[1]))return;
+    e.preventDefault();ensureCtx();started=true;paused=false;playBg();
+    toClip(m[1],a.querySelector('b').textContent,'picked from the playlist');
+  });
+  show(BG.title,BG.sub,'');
+})();
+</script>
+</body></html>
